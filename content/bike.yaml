@@ -1,0 +1,35 @@
+# バイク（数値・名前はサンプルなので書き換えてください）
+
+# 愛車（複数 OK。上から順に表示）
+bikes:
+  - name: Model Name
+    maker: Maker
+    year: "2021"
+    cc: 650
+    note: 今の相棒。ツーリングもワインディングもこれ一台。
+  - name: Old Model
+    maker: Maker
+    year: "2016"
+    cc: 250
+    note: 最初の一台。
+
+# 数字まわり
+stats:
+  totalKm: 32450 # 総走行距離（メーターに表示）
+  longestDayKm: 620 # 1日の最長距離
+  prefectures: 28 # 走った都道府県の数（47 に対するリングで表示）
+
+# お気に入りのルート（距離のバーで表示）
+routes:
+  - name: ビーナスライン
+    area: 長野
+    km: 76
+  - name: しまなみ海道
+    area: 広島〜愛媛
+    km: 70
+  - name: 磐梯吾妻スカイライン
+    area: 福島
+    km: 29
+  - name: 阿蘇パノラマライン
+    area: 熊本
+    km: 30

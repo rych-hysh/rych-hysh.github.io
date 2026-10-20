@@ -1,0 +1,134 @@
+---
+import { profile } from "../data/profile";
+
+const links = [
+  { href: "#about", label: "About" },
+  { href: "#skills", label: "Skills" },
+  { href: "#hobbies", label: "Hobbies" },
+  { href: "#contact", label: "Contact" },
+];
+---
+
+<div class="progress" aria-hidden="true"><span></span></div>
+<header class="nav">
+  <a href="#top" class="logo mono">
+    <span class="logo-mark"></span>{profile.name.split(" ")[0].toLowerCase()}<span class="blink">_</span>
+  </a>
+  <nav aria-label="Main">
+    <ul>
+      {links.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
+    </ul>
+  </nav>
+</header>
+
+<style>
+  .progress {
+    position: fixed;
+    inset: 0 0 auto 0;
+    height: 3px;
+    z-index: 60;
+  }
+
+  .progress span {
+    display: block;
+    height: 100%;
+    background: var(--rainbow);
+    transform-origin: left;
+    transform: scaleX(0);
+  }
+
+  .nav {
+    position: fixed;
+    top: 12px;
+    left: 50%;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    width: min(1200px, calc(100% - 2 * 16px));
+    padding: 10px 12px 10px 20px;
+    transform: translateX(-50%);
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 500;
+    font-size: 0.95rem;
+  }
+
+  .logo-mark {
+    width: 12px;
+    height: 12px;
+    border-radius: 4px;
+    background: var(--grad);
+    box-shadow: 0 0 12px rgba(0, 184, 217, 0.6);
+  }
+
+  .blink {
+    color: var(--cyan);
+    animation: blink 1s steps(2) infinite;
+  }
+
+  @keyframes blink {
+    50% {
+      opacity: 0;
+    }
+  }
+
+  ul {
+    display: flex;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  nav a {
+    display: block;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    color: var(--ink-2);
+    transition:
+      background 0.25s,
+      color 0.25s;
+  }
+
+  nav a:hover {
+    background: var(--ink);
+    color: #fff;
+  }
+
+  @media (max-width: 640px) {
+    .nav {
+      padding: 8px 8px 8px 16px;
+    }
+
+    nav a {
+      padding: 6px 8px;
+      font-size: 0.8rem;
+    }
+
+    ul {
+      gap: 0;
+    }
+  }
+
+  @media (max-width: 420px) {
+    .logo {
+      font-size: 0;
+    }
+
+    .logo .blink {
+      display: none;
+    }
+  }
+</style>

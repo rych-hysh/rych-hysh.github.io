@@ -1,0 +1,110 @@
+---
+import { skills, certifications } from "../data/profile";
+import { colorAt } from "../data/palette";
+import SkillCard from "./SkillCard.astro";
+---
+
+<section class="section" id="skills">
+  <div class="container">
+    <div class="section-head">
+      <span class="section-index">02 /</span>
+      <h2 class="section-title">Skills <span class="grad">&amp; Stack</span></h2>
+    </div>
+
+    <p class="hint mono">// hover or tap a card</p>
+    <div class="skill-grid" data-spotlight data-anim-scope>
+      {skills.map((g, i) => <SkillCard label={g.label} items={g.items} c={colorAt(i + 1)} c2={colorAt(i + 3)} />)}
+    </div>
+
+    <h3 class="sub-title mono">// certifications</h3>
+    <ul class="certs">
+      {
+        certifications.map((c, i) => (
+          <li class="cert" data-reveal style={`--c: ${colorAt(i + 2)}`}>
+            <span class="cert-year mono">{c.year}</span>
+            <span class="cert-name">{c.name}</span>
+            <span class="cert-issuer mono">{c.issuer}</span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .hint {
+    margin: -32px 0 24px;
+    font-size: 0.85rem;
+    color: var(--ink-3);
+  }
+
+  .skill-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+    gap: 24px;
+    margin-bottom: 80px;
+  }
+
+  .sub-title {
+    margin: 0 0 20px;
+    font-size: 0.95rem;
+    font-weight: 400;
+    color: var(--ink-3);
+  }
+
+  .certs {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--line);
+  }
+
+  .cert {
+    position: relative;
+    display: grid;
+    grid-template-columns: 80px 1fr auto;
+    gap: 16px;
+    align-items: baseline;
+    padding: 22px 8px;
+    border-bottom: 1px solid var(--line);
+    overflow: hidden;
+  }
+
+  .cert::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(90deg, color-mix(in srgb, var(--c) 18%, transparent), transparent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.5s cubic-bezier(0.7, 0, 0.2, 1);
+  }
+
+  .cert:hover::before {
+    transform: scaleX(1);
+  }
+
+  .cert-year {
+    font-size: 0.85rem;
+    color: color-mix(in srgb, var(--c) 72%, var(--ink));
+  }
+
+  .cert-name {
+    font-family: var(--font-jp);
+    font-size: clamp(1rem, 2vw, 1.25rem);
+    font-weight: 500;
+  }
+
+  .cert-issuer {
+    font-size: 0.8rem;
+    color: var(--ink-3);
+  }
+
+  @media (max-width: 560px) {
+    .cert {
+      grid-template-columns: 1fr;
+      gap: 2px;
+    }
+  }
+</style>

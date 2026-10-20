@@ -1,0 +1,303 @@
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import Lenis from "lenis";
+import { initHeroCanvas } from "./heroCanvas";
+import { initRiding } from "./riding";
+
+gsap.registerPlugin(ScrollTrigger);
+
+const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const $ = <T extends Element = HTMLElement>(s: string, root: ParentNode = document) =>
+  root.querySelector<T>(s);
+const $$ = <T extends Element = HTMLElement>(s: string, root: ParentNode = document) =>
+  Array.from(root.querySelectorAll<T>(s));
+
+/** テキストを1文字ずつ span に分割 */
+function splitChars(el: HTMLElement, className = "char") {
+  const text = el.textContent ?? "";
+  el.setAttribute("aria-label", text);
+  el.textContent = "";
+  return Array.from(text).map((ch) => {
+    const span = document.createElement("span");
+    span.className = className;
+    span.setAttribute("aria-hidden", "true");
+    span.style.display = "inline-block";
+    span.textContent = ch === " " ? " " : ch;
+    el.appendChild(span);
+    return span;
+  });
+}
+
+// ---------------------------------------------------------------- smooth scroll
+let lenis: Lenis | null = null;
+if (!reduced) {
+  lenis = new Lenis({ lerp: 0.1 });
+  lenis.on("scroll", ScrollTrigger.update);
+  gsap.ticker.add((time) => lenis!.raf(time * 1000));
+  gsap.ticker.lagSmoothing(0);
+}
+
+// アンカーリンクは Lenis 経由でスクロール
+$$<HTMLAnchorElement>('a[href^="#"]').forEach((a) => {
+  a.addEventListener("click", (e) => {
+    const target = $(a.getAttribute("href")!);
+    if (!target) return;
+    e.preventDefault();
+    if (lenis) lenis.scrollTo(target as HTMLElement, { offset: 0, duration: 1.4 });
+    else target.scrollIntoView();
+  });
+});
+
+// ---------------------------------------------------------------- hero
+const heroCanvas = $<HTMLCanvasElement>(".hero-canvas");
+if (heroCanvas) initHeroCanvas(heroCanvas, reduced);
+
+const typing = $("[data-typing]");
+
+if (reduced) {
+  if (typing) typing.textContent = typing.dataset.typing ?? "";
+} else {
+  const lines = $$("[data-split]");
+  const chars = lines.flatMap((l) => {
+    const c = splitChars(l);
+    // グラデーション文字は親の背景を引き継げないので各文字に付け直す
+    if (l.classList.contains("grad-text")) {
+      l.classList.remove("grad-text");
+      c.forEach((s) => s.classList.add("grad-text"));
+    }
+    return c;
+  });
+
+  const tl = gsap.timeline({ defaults: { ease: "expo.out" } });
+  tl.from(chars, { yPercent: 115, rotate: 8, duration: 1.4, stagger: 0.035 }, 0.2)
+    .from("[data-hero-fade]", { autoAlpha: 0, y: 16, duration: 1, stagger: 0.12 }, 0.6)
+    .from(".blob", { scale: 0.4, autoAlpha: 0, duration: 2.2, stagger: 0.2 }, 0);
+
+  // タイピング演出
+  if (typing) {
+    const full = typing.dataset.typing ?? "";
+    const state = { n: 0 };
+    tl.to(
+      state,
+      {
+        n: full.length,
+        duration: full.length * 0.06,
+        ease: "none",
+        onUpdate: () => (typing.textContent = full.slice(0, Math.round(state.n))),
+      },
+      1.1,
+    );
+  }
+
+  // スクロールでヒーローが奥へ抜けていく
+  gsap.to(".hero-inner", {
+    yPercent: -30,
+    autoAlpha: 0,
+    ease: "none",
+    scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true },
+  });
+  gsap.to(".hero-canvas", {
+    scale: 1.15,
+    autoAlpha: 0.2,
+    ease: "none",
+    scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true },
+  });
+
+  // 背景の blob はマウスにゆるく追従
+  const hero = $(".hero")!;
+  const b1x = gsap.quickTo(".blob-1", "x", { duration: 1.6, ease: "power3" });
+  const b1y = gsap.quickTo(".blob-1", "y", { duration: 1.6, ease: "power3" });
+  const b2x = gsap.quickTo(".blob-2", "x", { duration: 2.2, ease: "power3" });
+  const b2y = gsap.quickTo(".blob-2", "y", { duration: 2.2, ease: "power3" });
+  hero.addEventListener("pointermove", (e) => {
+    const nx = e.clientX / window.innerWidth - 0.5;
+    const ny = e.clientY / window.innerHeight - 0.5;
+    b1x(nx * -80);
+    b1y(ny * -60);
+    b2x(nx * 60);
+    b2y(ny * 50);
+  });
+}
+
+// ---------------------------------------------------------------- progress bar
+gsap.to(".progress span", {
+  scaleX: 1,
+  ease: "none",
+  scrollTrigger: { start: 0, end: "max", scrub: 0.3 },
+});
+
+if (!reduced) {
+  // ---------------------------------------------------------------- section titles
+  $$(".section-head").forEach((head) => {
+    gsap.from(head.children, {
+      y: 60,
+      autoAlpha: 0,
+      duration: 1.1,
+      ease: "expo.out",
+      stagger: 0.08,
+      scrollTrigger: { trigger: head, start: "top 85%" },
+    });
+  });
+
+  // ---------------------------------------------------------------- generic reveal
+  ScrollTrigger.batch("[data-reveal]", {
+    start: "top 88%",
+    once: true,
+    onEnter: (els) =>
+      gsap.fromTo(
+        els,
+        { autoAlpha: 0, y: 40 },
+        { autoAlpha: 1, y: 0, duration: 1, ease: "expo.out", stagger: 0.08, overwrite: true },
+      ),
+  });
+
+  // ---------------------------------------------------------------- intro text (scroll highlight)
+  $$("[data-words]").forEach((el) => {
+    const chars = splitChars(el, "w");
+    chars.forEach((c) => (c.style.display = "inline"));
+    gsap.fromTo(
+      chars,
+      { opacity: 0.15 },
+      {
+        opacity: 1,
+        stagger: 0.02,
+        ease: "none",
+        scrollTrigger: { trigger: el, start: "top 80%", end: "bottom 45%", scrub: true },
+      },
+    );
+  });
+
+  // ---------------------------------------------------------------- timeline line
+  gsap.to(".timeline-fill", {
+    scaleY: 1,
+    ease: "none",
+    scrollTrigger: { trigger: ".timeline", start: "top 70%", end: "bottom 60%", scrub: true },
+  });
+  $$(".tl-node").forEach((node) => {
+    gsap.from(node, {
+      scale: 0,
+      duration: 0.6,
+      ease: "back.out(3)",
+      scrollTrigger: { trigger: node, start: "top 70%" },
+    });
+  });
+
+  // ---------------------------------------------------------------- gallery (横スクロール)
+  const mm = gsap.matchMedia();
+  mm.add("(min-width: 761px)", () => {
+    const gallery = $("[data-gallery]")!;
+    const gTrack = $("[data-gallery-track]")!;
+    const distance = () => gTrack.scrollWidth - window.innerWidth;
+
+    const tween = gsap.to(gTrack, {
+      x: () => -distance(),
+      ease: "none",
+      scrollTrigger: {
+        trigger: gallery,
+        start: "center center",
+        end: () => `+=${distance()}`,
+        pin: true,
+        scrub: 0.8,
+        invalidateOnRefresh: true,
+      },
+    });
+
+    // 写真の中の視差
+    $$("[data-parallax]", gallery).forEach((img) => {
+      gsap.fromTo(
+        img,
+        { yPercent: -8, scale: 1.1 },
+        {
+          yPercent: 8,
+          scale: 1,
+          ease: "none",
+          scrollTrigger: {
+            trigger: img.closest(".photo"),
+            containerAnimation: tween,
+            start: "left right",
+            end: "right left",
+            scrub: true,
+          },
+        },
+      );
+    });
+  });
+  mm.add("(max-width: 760px)", () => {
+    gsap.from(".photo", {
+      autoAlpha: 0,
+      x: 60,
+      stagger: 0.1,
+      duration: 1,
+      ease: "expo.out",
+      scrollTrigger: { trigger: "[data-gallery]", start: "top 85%" },
+    });
+  });
+
+  // ---------------------------------------------------------------- magnetic buttons
+  $$("[data-magnetic]").forEach((el) => {
+    const xTo = gsap.quickTo(el, "x", { duration: 0.6, ease: "elastic.out(1, 0.4)" });
+    const yTo = gsap.quickTo(el, "y", { duration: 0.6, ease: "elastic.out(1, 0.4)" });
+    el.addEventListener("pointermove", (e) => {
+      const r = el.getBoundingClientRect();
+      xTo((e.clientX - (r.left + r.width / 2)) * 0.15);
+      yTo((e.clientY - (r.top + r.height / 2)) * 0.25);
+    });
+    el.addEventListener("pointerleave", () => {
+      xTo(0);
+      yTo(0);
+    });
+  });
+}
+
+// ---------------------------------------------------------------- 画面外の CSS アニメーションを停止
+const animObserver = new IntersectionObserver((entries) => {
+  for (const e of entries) e.target.classList.toggle("anim-paused", !e.isIntersecting);
+});
+$$("[data-anim-scope]").forEach((el) => animObserver.observe(el));
+
+// ---------------------------------------------------------------- skill cards
+// カーソル位置に光を当てる
+$$("[data-spotlight]").forEach((grid) => {
+  const cards = $$("[data-skill-card]", grid);
+  grid.addEventListener("pointermove", (e) => {
+    cards.forEach((card) => {
+      const r = card.getBoundingClientRect();
+      card.style.setProperty("--mx", `${e.clientX - r.left}px`);
+      card.style.setProperty("--my", `${e.clientY - r.top}px`);
+    });
+  });
+});
+// ホバーできる端末だけホバーで切り替え（タッチ端末で :hover が残り続けるのを防ぐ）
+document.documentElement.classList.toggle("can-hover", window.matchMedia("(hover: hover)").matches);
+// タップ / Enter でタグ表示を切り替え（ホバーできない端末向け）
+$$("[data-skill-card]").forEach((card) => {
+  const toggle = () => card.classList.toggle("is-open");
+  card.addEventListener("click", toggle);
+  card.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      toggle();
+    }
+  });
+});
+
+// ---------------------------------------------------------------- riding
+initRiding(reduced);
+
+// ---------------------------------------------------------------- globe (近づいたら読み込み)
+const globeCanvas = $<HTMLCanvasElement>("[data-globe]");
+if (globeCanvas) {
+  const io = new IntersectionObserver(
+    async ([entry]) => {
+      if (!entry.isIntersecting) return;
+      io.disconnect();
+      const { initGlobe } = await import("./globe");
+      initGlobe(globeCanvas, reduced);
+    },
+    { rootMargin: "600px 0px" },
+  );
+  io.observe(globeCanvas);
+}
+
+// フォントや画像の読み込みでレイアウトが変わったら再計算
+window.addEventListener("load", () => ScrollTrigger.refresh());

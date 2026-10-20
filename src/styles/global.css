@@ -1,0 +1,184 @@
+:root {
+  --bg: #f5fafc;
+  --bg-2: #eaf5f9;
+  --surface: rgba(255, 255, 255, 0.86);
+  --ink: #0b1b2b;
+  --ink-2: #4a5d70;
+  --ink-3: #8a9bab;
+  --line: rgba(11, 27, 43, 0.1);
+  --cyan: #00b8d9;
+  --blue: #3a7bff;
+  --mint: #2ee6a6;
+  --violet: #7b5cff;
+  --pink: #ff5fa2;
+  --coral: #ff8a5b;
+  --yellow: #ffc83d;
+  --grad: linear-gradient(120deg, var(--cyan), var(--blue) 45%, var(--violet) 75%, var(--pink));
+  --rainbow: linear-gradient(90deg, var(--mint), var(--cyan), var(--blue), var(--violet), var(--pink), var(--coral), var(--yellow));
+  /* セクションごとのアクセント（各セクションで上書き） */
+  --accent: var(--cyan);
+  --accent-2: var(--blue);
+  --radius: 20px;
+  --font-sans: "Space Grotesk", "Noto Sans JP", system-ui, sans-serif;
+  --font-jp: "Noto Sans JP", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "Noto Sans JP", ui-monospace, monospace;
+  --gutter: clamp(16px, 5vw, 64px);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+main {
+  overflow-x: clip;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+::selection {
+  background: var(--pink);
+  color: #fff;
+}
+
+/* 背景のうっすらしたグリッド */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-image:
+    linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(ellipse at 50% 0%, #000 0%, transparent 70%);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+.section {
+  position: relative;
+  padding: clamp(96px, 14vw, 180px) 0;
+}
+
+.section-head {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  margin-bottom: clamp(40px, 6vw, 72px);
+}
+
+.section-index {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--accent);
+}
+
+.section-title {
+  margin: 0;
+  font-size: clamp(2.4rem, 7vw, 5rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.section-title .grad {
+  background: linear-gradient(120deg, var(--accent), var(--accent-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.grad-text {
+  background: var(--grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.mono {
+  font-family: var(--font-mono);
+}
+
+.card {
+  /* backdrop-filter は近くで何かが動くたびに再計算されて重いので使わない（背景はほぼ無地） */
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+/* 画面外に出たブロックの CSS アニメーションは止める（main.ts が付け外しする） */
+.anim-paused,
+.anim-paused * {
+  animation-play-state: paused !important;
+}
+
+/* JS 有効時、アニメーション前の初期状態 */
+.js [data-reveal] {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js [data-reveal] {
+    opacity: 1;
+  }
+}
+
+#about {
+  --accent: var(--cyan);
+  --accent-2: var(--blue);
+}
+
+#skills {
+  --accent: var(--violet);
+  --accent-2: var(--pink);
+}
+
+#hobbies {
+  --accent: var(--coral);
+  --accent-2: var(--pink);
+}
+
+#contact {
+  --accent: var(--mint);
+  --accent-2: var(--cyan);
+}

@@ -1,0 +1,675 @@
+---
+// 趣味：バイク。走るバイクのシーン（SVG モーショングラフィック）＋メーター＋ツーリング記録
+import { bike } from "../data/profile";
+import { colorAt } from "../data/palette";
+
+const { bikes, stats, routes } = bike;
+
+// メーターの最大値：総走行距離を 1 万 km 単位で切り上げ
+const maxKm = Math.max(10000, Math.ceil(stats.totalKm / 10000) * 10000);
+const ratio = Math.min(1, stats.totalKm / maxKm);
+
+// メーター：中心 (110,118)、半径 86、左下(150°)から右下(390°)まで 240° の円弧
+const G = { cx: 110, cy: 118, r: 86, start: 150, sweep: 240 };
+const polar = (deg: number, r: number) => {
+  const a = (deg * Math.PI) / 180;
+  return [G.cx + r * Math.cos(a), G.cy + r * Math.sin(a)];
+};
+const [ax, ay] = polar(G.start, G.r);
+const [bx, by] = polar(G.start + G.sweep, G.r);
+const arc = `M${ax} ${ay} A${G.r} ${G.r} 0 1 1 ${bx} ${by}`;
+const ticks = Array.from({ length: 21 }, (_, i) => {
+  const deg = G.start + (G.sweep * i) / 20;
+  const major = i % 4 === 0;
+  const [x1, y1] = polar(deg, G.r - 12);
+  const [x2, y2] = polar(deg, G.r - (major ? 24 : 18));
+  const [lx, ly] = polar(deg, G.r - 36);
+  return { x1, y1, x2, y2, major, lx, ly, label: `${Math.round(((maxKm / 20) * i) / 1000)}k` };
+});
+
+const maxRoute = Math.max(1, ...routes.map((r) => r.km));
+const PREF_R = 30;
+const prefLen = 2 * Math.PI * PREF_R;
+---
+
+<div class="riding">
+  <p class="lead mono">// riding — バイク</p>
+
+  <div class="ride-grid">
+    <!-- ================================================= scene -->
+    <div class="scene card" data-ride-scene data-anim-scope>
+      <!--
+        各パーツを別レイヤー（HTML 要素）に分け、transform だけで動かす。
+        SVG の中の要素を動かすとシーン全体が毎フレーム再描画されるため。
+        .stage は 800×360 の座標系を「cover」でカードいっぱいに広げる入れ物。
+      -->
+      <div class="stage" role="img" aria-label="道路を走るバイクのアニメーション">
+        <span class="sun"></span>
+
+        <!-- 遠くの山・手前の丘（2枚分の幅を持たせて横にループ） -->
+        <svg class="layer" data-bk-layer="far" viewBox="0 0 1600 360" preserveAspectRatio="none" aria-hidden="true">
+          {
+            [0, 800].map((x) => (
+              <path
+                transform={`translate(${x} 0)`}
+                d="M0 222 L80 150 L150 192 L240 118 L330 186 L420 138 L520 200 L610 128 L700 182 L800 222 L800 292 L0 292 Z"
+                fill="#cfe9f7"
+              />
+            ))
+          }
+        </svg>
+        <svg class="layer" data-bk-layer="near" viewBox="0 0 1600 360" preserveAspectRatio="none" aria-hidden="true">
+          {
+            [0, 800].map((x) => (
+              <path
+                transform={`translate(${x} 0)`}
+                d="M0 262 C100 222 200 232 300 256 S500 228 600 250 S740 244 800 262 L800 292 L0 292 Z"
+                fill="#b4e6d6"
+              />
+            ))
+          }
+        </svg>
+
+        <!-- 道路と流れるセンターライン -->
+        <div class="road"><span class="road-dash" data-bk-dash></span></div>
+
+        <!-- スピード線（行ごとに横切らせる） -->
+        {
+          [
+            [140, 80, 0],
+            [178, 130, 1],
+            [206, 60, 2],
+            [232, 110, 3],
+            [258, 90, 4],
+            [120, 70, 5],
+            [270, 140, 6],
+          ].map(([y, len, i]) => (
+            <span class="speedline" data-bk-speedline style={`top: ${(y / 360) * 100}%`}>
+              <i style={`width: ${(len / 800) * 100}%; background: ${colorAt(i)}`} />
+            </span>
+          ))
+        }
+
+        <!-- バイク（ローカル座標 400×240：後輪(90,170) 前輪(310,170)） -->
+        <div class="rider" data-bk-bike>
+          <span class="puffs" aria-hidden="true">{[0, 1, 2, 3].map(() => <i data-bk-puff />)}</span>
+          <svg class="bike-body" viewBox="0 0 400 240" aria-hidden="true">
+            <defs>
+              <linearGradient id="bk-tank" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" style="stop-color: var(--cyan)"></stop>
+                <stop offset="0.55" style="stop-color: var(--violet)"></stop>
+                <stop offset="1" style="stop-color: var(--pink)"></stop>
+              </linearGradient>
+            </defs>
+            <g fill="none" stroke="#0b1b2b" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+              <!-- フェンダー -->
+              <path d="M262 143 A54 54 0 0 1 356 143" class="bk-line"></path>
+              <path d="M44 150 A54 54 0 0 1 104 118" class="bk-line"></path>
+              <!-- スイングアーム・リアサス -->
+              <path d="M90 170 L168 152" class="bk-line"></path>
+              <path d="M148 108 L126 160" style="stroke: var(--yellow)" stroke-width="5" class="bk-line"></path>
+              <!-- フレーム -->
+              <path d="M168 152 L188 110 L262 92" class="bk-line"></path>
+              <path d="M168 152 L236 166 L262 92" class="bk-line"></path>
+              <!-- フロントフォーク -->
+              <path d="M264 84 L310 170" stroke="#8fa2c4" stroke-width="7" class="bk-line"></path>
+              <!-- ハンドル・ミラー -->
+              <path d="M252 78 L268 70 L286 74" class="bk-line"></path>
+              <path d="M268 70 L262 54" stroke-width="2.5" class="bk-line"></path>
+              <!-- マフラー -->
+              <path d="M214 164 C204 186 160 190 128 178" stroke="#8fa2c4" stroke-width="5" class="bk-line"></path>
+              <!-- ステップ -->
+              <path d="M178 170 L194 170" class="bk-line"></path>
+            </g>
+            <!-- 塗り（線を描いたあとにフェードイン） -->
+            <g class="bk-fill">
+              <rect x="180" y="120" width="54" height="42" rx="8" fill="#2a3650"></rect>
+              <path d="M190 128 H226 M190 136 H226 M190 144 H226" stroke="#56688a" stroke-width="2"></path>
+              <path d="M128 172 L82 160 L78 170 L126 184 Z" fill="#c4d0e0"></path>
+              <path d="M180 104 C186 84 236 78 258 86 L262 96 C240 104 206 110 184 114 Z" fill="url(#bk-tank)"></path>
+              <path d="M112 104 C132 98 160 98 182 102 L180 112 C158 110 132 112 114 114 Z" fill="#0b1b2b"></path>
+              <path d="M86 104 L112 104 L112 114 L92 112 Z" fill="#0b1b2b"></path>
+              <rect x="82" y="103" width="8" height="5" rx="1.5" fill="#ff5f57"></rect>
+              <ellipse cx="262" cy="52" rx="7" ry="4" fill="#0b1b2b"></ellipse>
+              <circle cx="284" cy="98" r="10" fill="#fff1c2" stroke="#0b1b2b" stroke-width="3"></circle>
+            </g>
+          </svg>
+          <!-- 車輪は別レイヤーで回す -->
+          {
+            [90, 310].map((cx, i) => (
+              <svg
+                class="wheel"
+                data-bk-wheel
+                viewBox="-50 -50 100 100"
+                style={`left: ${((cx - 50) / 400) * 100}%; --rim: var(${i ? "--pink" : "--cyan"})`}
+                aria-hidden="true"
+              >
+                <circle r="44" fill="none" stroke="#0b1b2b" stroke-width="9" class="bk-line" />
+                <circle r="32" fill="none" stroke-width="2.5" class="bk-line rim" />
+                {[0, 60, 120].map((deg) => (
+                  <line
+                    x1={-32 * Math.cos((deg * Math.PI) / 180)}
+                    y1={-32 * Math.sin((deg * Math.PI) / 180)}
+                    x2={32 * Math.cos((deg * Math.PI) / 180)}
+                    y2={32 * Math.sin((deg * Math.PI) / 180)}
+                    stroke-width="2"
+                    class="bk-line rim"
+                  />
+                ))}
+                <circle r="13" fill="none" stroke="#8fa2c4" stroke-width="3" class="bk-line" />
+                <circle r="4" fill="#0b1b2b" class="bk-fill" />
+              </svg>
+            ))
+          }
+        </div>
+      </div>
+      <p class="scene-hint mono"><span class="on-hover">hover</span><span class="on-touch">tap</span> to rev ↗</p>
+    </div>
+
+    <!-- ================================================= meters -->
+    <div class="meters">
+      <div class="gauge card" data-reveal>
+        <svg viewBox="0 0 220 200" aria-hidden="true">
+          <defs>
+            <linearGradient id="bk-gauge" x1="0" y1="1" x2="1" y2="0">
+              <stop offset="0" style="stop-color: var(--mint)"></stop>
+              <stop offset="0.5" style="stop-color: var(--cyan)"></stop>
+              <stop offset="1" style="stop-color: var(--pink)"></stop>
+            </linearGradient>
+          </defs>
+          <path d={arc} fill="none" style="stroke: var(--line)" stroke-width="10" stroke-linecap="round"></path>
+          <path
+            d={arc}
+            fill="none"
+            stroke="url(#bk-gauge)"
+            stroke-width="10"
+            stroke-linecap="round"
+            pathLength="1"
+            stroke-dasharray="1"
+            stroke-dashoffset={1 - ratio}
+            data-gauge-arc
+            data-ratio={ratio}></path>
+          {
+            ticks.map((t) => (
+              <>
+                <line x1={t.x1} y1={t.y1} x2={t.x2} y2={t.y2} style={`stroke: var(${t.major ? "--ink" : "--ink-3"})`} stroke-width={t.major ? 2 : 1} />
+                {t.major && (
+                  <text x={t.lx} y={t.ly} class="tick-label" text-anchor="middle" dominant-baseline="middle">
+                    {t.label}
+                  </text>
+                )}
+              </>
+            ))
+          }
+          <g
+            data-gauge-needle
+            data-angle={G.start + G.sweep * ratio}
+            transform={`rotate(${G.start + G.sweep * ratio} ${G.cx} ${G.cy})`}
+          >
+            <line x1={G.cx - 10} y1={G.cy} x2={G.cx + G.r - 20} y2={G.cy} style="stroke: var(--pink)" stroke-width="3" stroke-linecap="round"></line>
+          </g>
+          <circle cx={G.cx} cy={G.cy} r="7" style="fill: var(--ink)"></circle>
+        </svg>
+        <p class="odo">
+          <span class="odo-num" data-count={stats.totalKm}>{stats.totalKm.toLocaleString("en-US")}</span>
+          <span class="odo-unit mono">km</span>
+        </p>
+        <p class="meter-label mono">total distance</p>
+      </div>
+
+      <div class="mini-stats">
+        <div class="mini card" data-reveal>
+          <p class="mini-num">
+            <span data-count={stats.longestDayKm}>{stats.longestDayKm.toLocaleString("en-US")}</span><small class="mono">km</small>
+          </p>
+          <p class="meter-label mono">longest day</p>
+        </div>
+        <div class="mini card pref" data-reveal>
+          <svg viewBox="0 0 80 80" aria-hidden="true">
+            <circle cx="40" cy="40" r={PREF_R} fill="none" style="stroke: var(--line)" stroke-width="8"></circle>
+            <circle
+              cx="40"
+              cy="40"
+              r={PREF_R}
+              fill="none"
+              style="stroke: var(--violet)"
+              stroke-width="8"
+              stroke-linecap="round"
+              stroke-dasharray={prefLen}
+              stroke-dashoffset={prefLen * (1 - stats.prefectures / 47)}
+              transform="rotate(-90 40 40)"
+              data-pref-ring
+              data-len={prefLen}
+              data-ratio={stats.prefectures / 47}></circle>
+          </svg>
+          <div>
+            <p class="mini-num"><span data-count={stats.prefectures}>{stats.prefectures}</span><small class="mono">/47</small></p>
+            <p class="meter-label mono">prefectures</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================================= routes & bikes -->
+  <div class="ride-lists">
+    <div>
+      <h3 class="sub mono">// favorite routes</h3>
+      <ol class="routes">
+        {
+          routes.map((r, i) => (
+            <li class="route" data-reveal style={`--c: ${colorAt(i + 1)}`}>
+              <div class="route-head">
+                <span class="route-name">{r.name}</span>
+                <span class="route-area">{r.area}</span>
+                <span class="route-km mono">{r.km} km</span>
+              </div>
+              <div class="route-bar">
+                <span data-route-bar style={`width: ${(r.km / maxRoute) * 100}%`} />
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+    <div>
+      <h3 class="sub mono">// garage</h3>
+      <ul class="bikes">
+        {
+          bikes.map((b, i) => (
+            <li class="bike card" data-reveal style={`--c: ${colorAt(i + 2)}`}>
+              <p class="bike-meta mono">
+                {b.year}
+                {b.cc && <> · {b.cc}cc</>}
+              </p>
+              <p class="bike-name">
+                <span class="bike-maker">{b.maker}</span> {b.name}
+              </p>
+              {b.note && <p class="bike-note">{b.note}</p>}
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</div>
+
+<style>
+  .riding {
+    margin-top: clamp(96px, 12vw, 160px);
+  }
+
+  .lead {
+    margin: 0 0 28px;
+    color: var(--ink-3);
+    font-size: 0.95rem;
+  }
+
+  .ride-grid {
+    display: grid;
+    grid-template-columns: 1.7fr 1fr;
+    gap: 16px;
+  }
+
+  /* ---------- scene */
+  .scene {
+    position: relative;
+    min-height: 300px;
+    overflow: hidden;
+    padding: 0;
+    background: #e3f6ff;
+    cursor: pointer;
+  }
+
+  /* 800×360 の舞台を、カードを覆うように拡大（preserveAspectRatio="slice" 相当）。下端揃え */
+  .scene {
+    container-type: size;
+  }
+
+  .stage {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: max(100cqw, 100cqh * 800 / 360);
+    aspect-ratio: 800 / 360;
+    overflow: hidden;
+    background: linear-gradient(#e3f6ff, #ffffff);
+    translate: -50% 0;
+  }
+
+  .stage > * {
+    position: absolute;
+  }
+
+  .sun {
+    left: calc(616 / 800 * 100%);
+    top: calc(44 / 360 * 100%);
+    width: calc(68 / 800 * 100%);
+    aspect-ratio: 1;
+    background: #fff1c2;
+    border-radius: 50%;
+  }
+
+  .layer {
+    top: 0;
+    left: 0;
+    width: 200%;
+    height: 100%;
+    will-change: transform;
+  }
+
+  .road {
+    left: 0;
+    right: 0;
+    top: calc(288 / 360 * 100%);
+    bottom: 0;
+    overflow: hidden;
+    background: #22304a;
+    box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.25);
+  }
+
+  /* 40:30 の破線。幅を 2 倍にして 1 周期ぶん横にずらし続ける */
+  .road-dash {
+    position: absolute;
+    left: 0;
+    top: calc(38 / 72 * 100%);
+    width: 200%;
+    height: calc(5 / 72 * 100%);
+    background: repeating-linear-gradient(90deg, #ffd166 0 2.5%, transparent 2.5% 4.375%);
+    will-change: transform;
+  }
+
+  .speedline {
+    left: 0;
+    width: 100%;
+    height: calc(3 / 360 * 100%);
+    will-change: transform;
+  }
+
+  .speedline i {
+    position: absolute;
+    left: 100%;
+    height: 100%;
+    border-radius: 99px;
+    opacity: 0.55;
+  }
+
+  .rider {
+    left: 25%;
+    top: 20%;
+    width: 50%;
+    aspect-ratio: 400 / 240;
+    will-change: transform;
+  }
+
+  .bike-body {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  .wheel {
+    position: absolute;
+    top: calc(120 / 240 * 100%);
+    width: 25%;
+    aspect-ratio: 1;
+    overflow: visible;
+    will-change: transform;
+  }
+
+  .wheel .rim {
+    stroke: var(--rim);
+  }
+
+  .puffs i {
+    position: absolute;
+    left: calc(72 / 400 * 100%);
+    top: calc(160 / 240 * 100%);
+    width: calc(14 / 400 * 100%);
+    aspect-ratio: 1;
+    background: #c9d6e8;
+    border-radius: 50%;
+    opacity: 0;
+    will-change: transform, opacity;
+  }
+
+  .scene-hint {
+    position: absolute;
+    top: 14px;
+    left: 16px;
+    margin: 0;
+    padding: 3px 10px;
+    font-size: 0.75rem;
+    color: var(--ink-2);
+    background: rgba(255, 255, 255, 0.75);
+    border-radius: 999px;
+  }
+
+  .on-touch {
+    display: none;
+  }
+
+  @media (hover: none) {
+    .on-hover {
+      display: none;
+    }
+
+    .on-touch {
+      display: inline;
+    }
+  }
+
+  .js .bk-fill {
+    opacity: 0;
+  }
+
+  /* ---------- meters */
+  .meters {
+    display: grid;
+    gap: 16px;
+  }
+
+  .gauge {
+    padding: 18px 20px 20px;
+    text-align: center;
+  }
+
+  .gauge svg {
+    display: block;
+    width: 100%;
+    max-width: 260px;
+    margin: 0 auto -28px;
+    overflow: visible;
+  }
+
+  .tick-label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    fill: var(--ink-3);
+  }
+
+  .odo {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 6px;
+    margin: 0;
+  }
+
+  .odo-num {
+    font-size: clamp(2rem, 4vw, 2.6rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .odo-unit {
+    color: var(--ink-3);
+  }
+
+  .meter-label {
+    margin: 2px 0 0;
+    font-size: 0.75rem;
+    color: var(--ink-3);
+  }
+
+  .mini-stats {
+    display: grid;
+    grid-template-columns: 1fr 1.3fr;
+    gap: 16px;
+  }
+
+  .mini {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 18px 20px;
+  }
+
+  .mini-num {
+    margin: 0;
+    font-size: 1.7rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .mini-num small {
+    margin-left: 3px;
+    font-size: 0.8rem;
+    font-weight: 400;
+    color: var(--ink-3);
+  }
+
+  .pref {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 14px;
+  }
+
+  .pref svg {
+    flex-shrink: 0;
+    width: 64px;
+  }
+
+  /* ---------- lists */
+  .ride-lists {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: clamp(32px, 5vw, 64px);
+    margin-top: 48px;
+  }
+
+  .sub {
+    margin: 0 0 16px;
+    font-size: 0.9rem;
+    font-weight: 400;
+    color: var(--ink-3);
+  }
+
+  .routes,
+  .bikes {
+    display: grid;
+    gap: 14px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .route-head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 8px;
+    font-family: var(--font-jp);
+  }
+
+  .route-name {
+    font-weight: 500;
+  }
+
+  .route-area {
+    font-size: 0.85rem;
+    color: var(--ink-3);
+  }
+
+  .route-km {
+    margin-left: auto;
+    font-size: 0.85rem;
+    color: color-mix(in srgb, var(--c) 72%, var(--ink));
+  }
+
+  .route-bar {
+    height: 8px;
+    overflow: hidden;
+    background: var(--line);
+    border-radius: 999px;
+  }
+
+  .route-bar span {
+    display: block;
+    height: 100%;
+    background: linear-gradient(90deg, color-mix(in srgb, var(--c) 40%, #fff), var(--c));
+    border-radius: inherit;
+    transform-origin: left;
+  }
+
+  .bike {
+    position: relative;
+    padding: 16px 18px 16px 22px;
+    overflow: hidden;
+  }
+
+  .bike::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 4px;
+    background: var(--c);
+  }
+
+  .bike-meta {
+    margin: 0;
+    font-size: 0.75rem;
+    color: color-mix(in srgb, var(--c) 72%, var(--ink));
+  }
+
+  .bike-name {
+    margin: 2px 0 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+  }
+
+  .bike-maker {
+    font-weight: 500;
+    color: var(--ink-2);
+  }
+
+  .bike-note {
+    margin: 4px 0 0;
+    font-family: var(--font-jp);
+    font-size: 0.88rem;
+    color: var(--ink-2);
+  }
+
+  @media (max-width: 860px) {
+    .ride-grid,
+    .ride-lists {
+      grid-template-columns: 1fr;
+    }
+
+    /* 1 カラムでは高さを明示（container query の高さ単位を有効にするため） */
+    .scene {
+      height: clamp(280px, 72vw, 420px);
+    }
+  }
+
+  @media (max-width: 420px) {
+    .mini-stats {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

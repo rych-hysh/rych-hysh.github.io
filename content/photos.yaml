@@ -1,0 +1,22 @@
+# 写真
+# 1. 画像を content/photos/ に入れる（jpg / png / webp / avif、スマホの写真そのままで OK）
+# 2. ここに file・タイトル・場所を書く（書かなくても表示され、ファイル名がタイトルになります）
+# 並び順はこのリストの順。リストにない写真は最後に追加されます。
+- file: sample-1.jpg
+  title: Morning Haze
+  place: Kyoto
+- file: sample-2.jpg
+  title: Blue Hour
+  place: Reykjavík
+- file: sample-3.jpg
+  title: Coastline
+  place: Okinawa
+- file: sample-4.jpg
+  title: Neon Street
+  place: Taipei
+- file: sample-5.jpg
+  title: Glacier
+  place: Patagonia
+- file: sample-6.jpg
+  title: Old Town
+  place: Lisbon

@@ -1,0 +1,255 @@
+---
+import { profile } from "../data/profile";
+
+const [first, ...rest] = profile.name.split(" ");
+const last = rest.join(" ");
+---
+
+<section class="hero" id="top" data-anim-scope>
+  <canvas class="hero-canvas" aria-hidden="true"></canvas>
+  <div class="blob blob-1" aria-hidden="true"></div>
+  <div class="blob blob-2" aria-hidden="true"></div>
+  <div class="blob blob-3" aria-hidden="true"></div>
+  <div class="blob blob-4" aria-hidden="true"></div>
+
+  <div class="container hero-inner">
+    <p class="hero-kicker mono" data-hero-fade>
+      <span class="dot"></span> Hello, world. I'm
+    </p>
+    <h1 class="hero-title">
+      <span class="line" data-split>{first}</span>
+      <span class="line grad-text" data-split>{last}</span>
+    </h1>
+    <p class="hero-role mono" data-hero-fade>
+      <span>&gt;</span> <span data-typing={profile.role}></span><span class="caret">▍</span>
+    </p>
+    <p class="hero-tagline" data-hero-fade>{profile.tagline}</p>
+  </div>
+
+  <a href="#about" class="scroll-hint mono" data-hero-fade>
+    <span>scroll</span>
+    <span class="scroll-line"></span>
+  </a>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-height: 100svh;
+    overflow: hidden;
+  }
+
+  .hero-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.55;
+    pointer-events: none;
+  }
+
+  .blob-1 {
+    width: 46vw;
+    height: 46vw;
+    top: -10vw;
+    right: -10vw;
+    background: radial-gradient(circle, #8fe9ff, transparent 70%);
+  }
+
+  .blob-2 {
+    width: 36vw;
+    height: 36vw;
+    bottom: -12vw;
+    left: -8vw;
+    background: radial-gradient(circle, #a8f5dc, transparent 70%);
+  }
+
+  .blob-3 {
+    width: 30vw;
+    height: 30vw;
+    top: 30%;
+    right: 18%;
+    background: radial-gradient(circle, #ffb3d4, transparent 70%);
+    opacity: 0.45;
+  }
+
+  .blob-4 {
+    width: 26vw;
+    height: 26vw;
+    bottom: 4%;
+    right: -4vw;
+    background: radial-gradient(circle, #ffe08a, transparent 70%);
+    opacity: 0.45;
+  }
+
+  .blob {
+    animation: drift 14s ease-in-out infinite alternate;
+  }
+
+  .blob-2 {
+    animation-duration: 18s;
+  }
+
+  .blob-3 {
+    animation-duration: 11s;
+    animation-direction: alternate-reverse;
+  }
+
+  .blob-4 {
+    animation-duration: 16s;
+  }
+
+  @keyframes drift {
+    to {
+      translate: 6vw -4vw;
+      scale: 1.15;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .blob {
+      animation: none;
+    }
+  }
+
+  .hero-inner {
+    position: relative;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .hero-inner a {
+    pointer-events: auto;
+  }
+
+  .hero-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 20px;
+    padding: 6px 14px;
+    font-size: 0.85rem;
+    color: var(--ink-2);
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+  }
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--mint);
+    box-shadow: 0 0 0 0 rgba(46, 230, 166, 0.6);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    70% {
+      box-shadow: 0 0 0 10px rgba(46, 230, 166, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(46, 230, 166, 0);
+    }
+  }
+
+  .hero-title {
+    margin: 0;
+    font-size: clamp(3.4rem, 13vw, 10.5rem);
+    font-weight: 700;
+    line-height: 0.92;
+    letter-spacing: -0.045em;
+  }
+
+  .line {
+    display: block;
+    overflow: hidden;
+    padding-bottom: 0.22em;
+    margin-bottom: -0.16em;
+  }
+
+  /*
+   * グラデーション文字は background-clip: text なので、文字の箱の外（y の払いなど）は塗られない。
+   * 1 文字ずつの箱を下に広げて、行間は打ち消して変えない。文字は JS で生成されるので :global
+   */
+  .line :global(.char) {
+    padding-bottom: 0.22em;
+    margin-bottom: -0.22em;
+  }
+
+  .hero-role {
+    margin: 28px 0 8px;
+    font-size: clamp(1rem, 2vw, 1.25rem);
+    color: var(--violet);
+  }
+
+  .hero-role > :first-child,
+  .caret {
+    color: var(--pink);
+  }
+
+  .caret {
+    margin-left: 2px;
+    animation: blink 1s steps(2) infinite;
+  }
+
+  @keyframes blink {
+    50% {
+      opacity: 0;
+    }
+  }
+
+  .hero-tagline {
+    max-width: 34ch;
+    margin: 0;
+    font-size: clamp(1rem, 1.6vw, 1.2rem);
+    color: var(--ink-2);
+  }
+
+  .scroll-hint {
+    position: absolute;
+    left: 50%;
+    bottom: 28px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    color: var(--ink-3);
+    transform: translateX(-50%);
+  }
+
+  .scroll-line {
+    position: relative;
+    width: 1px;
+    height: 48px;
+    background: var(--line);
+    overflow: hidden;
+  }
+
+  .scroll-line::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--cyan);
+    animation: drip 1.8s cubic-bezier(0.7, 0, 0.3, 1) infinite;
+  }
+
+  @keyframes drip {
+    0% {
+      transform: translateY(-100%);
+    }
+    100% {
+      transform: translateY(100%);
+    }
+  }
+</style>

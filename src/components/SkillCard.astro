@@ -1,0 +1,321 @@
+---
+// Skills のカード：普段はコードエディタ風、ホバー（タッチ端末ではタップ）で読みやすいタグ表示に切り替わる
+interface Props {
+  label: string;
+  items: string[];
+  c: string;
+  c2: string;
+}
+
+const { label, items, c, c2 } = Astro.props;
+// "Backend / Infra" → "backend_infra"
+const name = label.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "");
+---
+
+<article
+  class="cc"
+  style={`--c: ${c}; --c2: ${c2}`}
+  tabindex="0"
+  aria-label={`${label}: ${items.join(", ")}`}
+  data-reveal
+  data-skill-card
+>
+  <div class="cc-ring" aria-hidden="true"><span></span></div>
+  <div class="cc-inner">
+    <div class="cc-bar">
+      <i></i><i></i><i></i>
+      <span class="cc-tab mono">{name}.ts</span>
+      <em class="cc-count mono">{items.length} items</em>
+    </div>
+    <div class="cc-body">
+      <pre class="cc-code mono" aria-hidden="true"><code><span class="ln">1</span><span class="kw">export const</span> <span class="var">{name}</span> = [
+{items.map((s, k) => (
+  <><span class="ln">{k + 2}</span>  <span class="str">"{s}"</span>,
+</>
+))}<span class="ln">{items.length + 2}</span>] <span class="kw">as const</span>;<span class="cursor">▍</span></code></pre>
+      <div class="cc-view" aria-hidden="true">
+        <p class="cc-view-label">{label}</p>
+        <ul>
+          {items.map((s, k) => (
+            <li style={`--k: ${k}`}>{s}</li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </div>
+</article>
+
+<style>
+  /*
+   * 光る枠は「大きな conic-gradient の板を transform で回す」方式。
+   * transform だけのアニメーションなので GPU（コンポジタ）で処理され、毎フレームの再描画が起きない。
+   * 外側のにじみは静的な box-shadow（ホバー時だけ変化）にして、常時のコストをなくしている。
+   */
+  .cc {
+    --mx: -500px;
+    --my: -500px;
+    position: relative;
+    padding: 1.5px;
+    border-radius: 18px;
+    isolation: isolate;
+    outline: none;
+    box-shadow:
+      0 0 32px -12px var(--c),
+      0 18px 40px -24px var(--c2);
+    /* opacity / transform は GSAP の登場アニメと競合させないよう translate で動かす */
+    transition:
+      translate 0.45s cubic-bezier(0.2, 0.8, 0.2, 1),
+      box-shadow 0.45s;
+  }
+
+  .cc-ring {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    border-radius: inherit;
+  }
+
+  .cc-ring span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    /* 回転してもカードの角まで覆える大きさ（横長カードの対角線より少し大きく） */
+    width: 150%;
+    aspect-ratio: 1;
+    background: conic-gradient(transparent 55%, var(--c) 78%, var(--c2) 90%, transparent);
+    animation: cc-spin 6s linear infinite;
+    will-change: transform;
+  }
+
+  :global(.skill-grid) > .cc:nth-child(2n) .cc-ring span {
+    animation-delay: -3s;
+  }
+
+  @keyframes cc-spin {
+    from {
+      transform: translate(-50%, -50%) rotate(0deg);
+    }
+    to {
+      transform: translate(-50%, -50%) rotate(360deg);
+    }
+  }
+
+  :global(.can-hover) .cc:hover,
+  .cc:focus-visible,
+  .cc.is-open {
+    translate: 0 -6px;
+  }
+
+  :global(.can-hover) .cc:hover,
+  .cc:focus-visible,
+  .cc.is-open {
+    box-shadow:
+      0 0 48px -6px var(--c),
+      0 24px 60px -18px var(--c2);
+  }
+
+  .cc-inner {
+    position: relative;
+    height: 100%;
+    overflow: hidden;
+    border-radius: 16.5px;
+  }
+
+  .cc-bar {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 12px 16px;
+  }
+
+  .cc-bar i {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: #ff5f57;
+  }
+
+  .cc-bar i:nth-child(2) {
+    background: #febc2e;
+  }
+
+  .cc-bar i:nth-child(3) {
+    background: #28c840;
+  }
+
+  .cc-tab {
+    margin-left: 10px;
+    padding: 3px 12px;
+    font-size: 0.8rem;
+    border-top: 2px solid var(--c);
+    border-radius: 4px;
+  }
+
+  .cc-count {
+    margin-left: auto;
+    font-size: 0.75rem;
+    font-style: normal;
+  }
+
+  .cc-body {
+    position: relative;
+  }
+
+  .cc-code {
+    margin: 0;
+    padding: 18px 20px 24px;
+    font-size: 1rem;
+    line-height: 1.85;
+    white-space: pre;
+    overflow-x: auto;
+    transition:
+      opacity 0.35s,
+      filter 0.35s,
+      transform 0.35s;
+  }
+
+  .ln {
+    display: inline-block;
+    width: 1.4em;
+    margin-right: 14px;
+    text-align: right;
+    user-select: none;
+  }
+
+  .cursor {
+    color: var(--c);
+    animation: blink 1s steps(2) infinite;
+  }
+
+  @keyframes blink {
+    50% {
+      opacity: 0;
+    }
+  }
+
+  /* ---------------- colors */
+  .cc {
+    background:
+      radial-gradient(300px circle at var(--mx) var(--my), var(--c), transparent 60%),
+      #1c2944;
+  }
+
+  .cc-inner {
+    color: #e6edf8;
+    background:
+      radial-gradient(380px circle at var(--mx) var(--my), color-mix(in srgb, var(--c) 12%, transparent), transparent 60%),
+      #0f1a2e;
+  }
+
+  .cc .cc-bar {
+    background: rgba(255, 255, 255, 0.04);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  }
+
+  .cc .cc-tab {
+    color: #f2f6ff;
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  .cc .cc-count {
+    color: #8fa2c4;
+  }
+
+  .cc .ln {
+    color: #56688a;
+  }
+
+  .cc .kw {
+    color: #c3a6ff;
+  }
+
+  .cc .var {
+    color: color-mix(in srgb, var(--c) 70%, #fff);
+    font-weight: 500;
+  }
+
+  /* 文字列は白にして読みやすく、色は左の印で */
+  .cc .str {
+    color: #ffffff;
+    font-weight: 500;
+  }
+
+  /* ---------------- reveal（ホバー / タップでタグ表示に切り替え） */
+  .cc-view {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 16px;
+    padding: 20px 24px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s;
+  }
+
+  .cc-view-label {
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: color-mix(in srgb, var(--c) 70%, #fff);
+  }
+
+  .cc-view ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .cc-view li {
+    padding: 8px 16px;
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #fff;
+    background: color-mix(in srgb, var(--c) 22%, transparent);
+    border: 1px solid color-mix(in srgb, var(--c) 60%, transparent);
+    border-radius: 999px;
+    opacity: 0;
+    transform: translateY(12px) scale(0.9);
+    transition:
+      opacity 0.35s,
+      transform 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.3);
+    transition-delay: calc(var(--k) * 35ms);
+  }
+
+  :global(.can-hover) .cc:hover .cc-code,
+  .cc:focus-visible .cc-code,
+  .cc.is-open .cc-code {
+    opacity: 0.08;
+    filter: blur(3px);
+    transform: scale(0.98);
+  }
+
+  :global(.can-hover) .cc:hover .cc-view,
+  .cc:focus-visible .cc-view,
+  .cc.is-open .cc-view {
+    opacity: 1;
+  }
+
+  :global(.can-hover) .cc:hover .cc-view li,
+  .cc:focus-visible .cc-view li,
+  .cc.is-open .cc-view li {
+    opacity: 1;
+    transform: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cc span,
+    .cursor {
+      animation: none;
+    }
+
+    .cc span {
+      transform: translate(-50%, -50%) rotate(200deg);
+    }
+  }
+</style>

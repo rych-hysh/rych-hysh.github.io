@@ -1,0 +1,22 @@
+# スキル（グループごとにカードになります）
+groups:
+  - label: Languages
+    items: [TypeScript, Python, Go, C++, SQL]
+  - label: Frontend
+    items: [React, Next.js, Astro, GSAP, Three.js]
+  - label: Backend / Infra
+    items: [Node.js, FastAPI, PostgreSQL, Docker, AWS, Terraform]
+  - label: Tools
+    items: [Git, GitHub Actions, Figma, Linux]
+
+# 資格
+certifications:
+  - name: 応用情報技術者
+    issuer: IPA
+    year: "2018"
+  - name: AWS Certified Solutions Architect – Associate
+    issuer: AWS
+    year: "2021"
+  - name: TOEIC 900
+    issuer: IIBC
+    year: "2020"

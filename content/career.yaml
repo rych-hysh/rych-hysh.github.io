@@ -1,0 +1,15 @@
+# 経歴（上から新しい順に表示されます）
+- period: 2022 — Now
+  title: Software Engineer
+  org: Company Name
+  description: 〇〇プロダクトの設計・開発を担当。チームリードとして〜〜を推進。
+
+- period: 2019 — 2022
+  title: Engineer
+  org: Company Name
+  description: 〇〇システムの開発・運用。〜〜の改善でパフォーマンスを〇〇%向上。
+
+- period: 2015 — 2019
+  title: B.S. in Computer Science
+  org: University Name
+  description: 〇〇研究室にて〜〜を研究。
