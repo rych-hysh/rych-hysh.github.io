@@ -489,24 +489,66 @@ export function initGlobe(canvas: HTMLCanvasElement, reduced: boolean) {
   });
 
   // ドラッグで回転（ズーム中は回転を遅く）
+  // タッチ操作は最初の動きで方向を判定し、横なら地球儀を回す・縦ならページのスクロールに任せる
+  // （canvas は CSS で touch-action: pan-y。縦スワイプ中に地球儀が動かないようにする）
+  const LOCK_PX = 8;
+  let pointerId = -1;
+  let isTouch = false;
+  let axis: "none" | "x" | "y" = "none";
+  let startX = 0;
+  let startY = 0;
   let lastX = 0;
   let lastY = 0;
-  canvas.addEventListener("pointerdown", (e) => {
+
+  const beginDrag = () => {
     dragging = true;
-    lastX = e.clientX;
-    lastY = e.clientY;
-    canvas.setPointerCapture(e.pointerId);
     gsap.killTweensOf(view, "lng,lat,zoom");
+  };
+
+  canvas.addEventListener("pointerdown", (e) => {
+    pointerId = e.pointerId;
+    isTouch = e.pointerType !== "mouse";
+    axis = isTouch ? "none" : "x";
+    startX = lastX = e.clientX;
+    startY = lastY = e.clientY;
+    if (!isTouch) {
+      canvas.setPointerCapture(e.pointerId);
+      beginDrag();
+    }
   });
+
   canvas.addEventListener("pointermove", (e) => {
-    if (!dragging) return;
+    if (e.pointerId !== pointerId) return;
+    if (isTouch && axis === "none") {
+      const dx = Math.abs(e.clientX - startX);
+      const dy = Math.abs(e.clientY - startY);
+      if (dx < LOCK_PX && dy < LOCK_PX) return;
+      axis = dx > dy ? "x" : "y";
+      if (axis === "x") {
+        canvas.setPointerCapture(e.pointerId);
+        beginDrag();
+        lastX = e.clientX;
+        lastY = e.clientY;
+      }
+      return;
+    }
+    if (!dragging || axis === "y") return;
     view.lng += ((e.clientX - lastX) * 0.4) / view.zoom;
-    view.lat = Math.max(-80, Math.min(80, view.lat + ((e.clientY - lastY) * 0.3) / view.zoom));
+    // 上下の回転はマウスのときだけ（タッチの縦方向はスクロール）
+    if (!isTouch) {
+      view.lat = Math.max(-80, Math.min(80, view.lat + ((e.clientY - lastY) * 0.3) / view.zoom));
+    }
     lastX = e.clientX;
     lastY = e.clientY;
     redrawIfIdle();
   });
-  const end = () => (dragging = false);
+
+  const end = (e: PointerEvent) => {
+    if (e.pointerId !== pointerId) return;
+    dragging = false;
+    pointerId = -1;
+    axis = "none";
+  };
   canvas.addEventListener("pointerup", end);
   canvas.addEventListener("pointercancel", end);
 

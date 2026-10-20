@@ -167,35 +167,47 @@ const maxRoute = Math.max(1, ...routes.map((r) => r.km));
         <span class="mini-puffs"><i></i><i></i><i></i></span>
         <svg viewBox="0 0 400 240">
           <defs>
+            <!-- 愛車に合わせて黒いタンク -->
             <linearGradient id="mini-tank" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0" style="stop-color: var(--cyan)"></stop>
-              <stop offset="0.55" style="stop-color: var(--violet)"></stop>
-              <stop offset="1" style="stop-color: var(--pink)"></stop>
+              <stop offset="0" stop-color="#4a5a78"></stop>
+              <stop offset="0.5" stop-color="#1a2438"></stop>
+              <stop offset="1" stop-color="#0b1b2b"></stop>
             </linearGradient>
           </defs>
+          <!-- アメリカン（クルーザー）：長いホイールベース・寝かせたフォーク・低いシート -->
           <g fill="none" stroke="#0b1b2b" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M262 143 A54 54 0 0 1 356 143"></path>
-            <path d="M90 170 L168 152"></path>
-            <path d="M168 152 L188 110 L262 92"></path>
-            <path d="M168 152 L236 166 L262 92"></path>
-            <path d="M264 84 L310 170" stroke="#8fa2c4" stroke-width="10"></path>
-            <path d="M252 78 L268 70 L286 74"></path>
-            <path d="M214 164 C204 186 160 190 128 178" stroke="#8fa2c4"></path>
+            <path d="M29 170 A52 52 0 0 1 113 140"></path>
+            <path d="M295 145 A50 50 0 0 1 355 137"></path>
+            <path d="M80 180 L170 165"></path>
+            <path d="M120 128 L105 172" stroke="#8fa2c4" stroke-width="7"></path>
+            <path d="M150 122 L200 104 L272 88"></path>
+            <path d="M272 92 L238 170 L170 165"></path>
+            <path d="M272 84 L330 180" stroke="#8fa2c4" stroke-width="10"></path>
+            <path d="M266 78 L256 54 L234 58"></path>
+            <path d="M226 172 C200 196 130 198 62 194" stroke="#8fa2c4"></path>
+            <path d="M262 170 L282 170"></path>
           </g>
-          <rect x="180" y="120" width="54" height="42" rx="8" fill="#2a3650"></rect>
-          <path d="M180 104 C186 84 236 78 258 86 L262 96 C240 104 206 110 184 114 Z" fill="url(#mini-tank)"></path>
-          <path d="M112 104 C132 98 160 98 182 102 L180 112 C158 110 132 112 114 114 Z" fill="#0b1b2b"></path>
-          <circle cx="284" cy="98" r="11" fill="#fff1c2" stroke="#0b1b2b" stroke-width="5"></circle>
+          <!-- V ツイン風のエンジン -->
+          <g fill="#2a3650">
+            <rect x="180" y="138" width="58" height="34" rx="8"></rect>
+            <path d="M212 142 L236 112 L250 122 L228 150 Z"></path>
+            <path d="M196 142 L184 110 L200 104 L212 138 Z"></path>
+          </g>
+          <path d="M62 188 L38 192 L40 203 L64 200 Z" fill="#c4d0e0"></path>
+          <path d="M196 100 C204 84 252 80 270 90 L268 98 C246 104 214 108 198 110 Z" fill="url(#mini-tank)"></path>
+          <path d="M106 122 C124 112 158 114 182 116 L198 108 L201 114 L186 127 C160 129 132 129 108 131 Z" fill="#0b1b2b"></path>
+          <circle cx="292" cy="96" r="11" fill="#fff1c2" stroke="#0b1b2b" stroke-width="5"></circle>
           {
-            [90, 310].map((cx, i) => (
+            [80, 330].map((cx, i) => (
               <g class="mini-wheel">
-                <circle cx={cx} cy="170" r="44" fill="none" stroke="#0b1b2b" stroke-width="12" />
-                <circle cx={cx} cy="170" r="30" fill="none" style={`stroke: var(${i ? "--pink" : "--cyan"})`} stroke-width="5" />
+                <circle cx={cx} cy="180" r="40" fill="none" stroke="#0b1b2b" stroke-width="15" />
+                <circle cx={cx} cy="180" r="25" fill="none" style={`stroke: var(${i ? "--pink" : "--cyan"})`} stroke-width="4" />
                 <path
-                  d={`M${cx - 30} 170 H${cx + 30} M${cx} 140 V200`}
-                  style={`stroke: var(${i ? "--pink" : "--cyan"})`}
+                  d={`M${cx - 25} 180 H${cx + 25} M${cx} 155 V205`}
+                  stroke="#8fa2c4"
                   stroke-width="4"
                 />
+                <circle cx={cx} cy="180" r="6" fill="#0b1b2b" />
               </g>
             ))
           }
@@ -431,7 +443,7 @@ const maxRoute = Math.max(1, ...routes.map((r) => r.km));
     position: absolute;
     right: 100%;
     bottom: 1px;
-    width: 64px;
+    width: 76px;
     aspect-ratio: 400 / 240;
     animation: mini-bob 0.36s ease-in-out infinite alternate;
   }
@@ -451,8 +463,8 @@ const maxRoute = Math.max(1, ...routes.map((r) => r.km));
 
   .mini-puffs i {
     position: absolute;
-    left: 14%;
-    bottom: 22%;
+    left: 7%;
+    bottom: 14%;
     width: 7px;
     aspect-ratio: 1;
     background: #c9d6e8;
@@ -474,7 +486,7 @@ const maxRoute = Math.max(1, ...routes.map((r) => r.km));
       transform: translateX(0);
     }
     to {
-      transform: translateX(calc(100% + 64px));
+      transform: translateX(calc(100% + 76px));
     }
   }
 

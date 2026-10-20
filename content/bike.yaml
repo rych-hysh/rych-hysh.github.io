@@ -1,21 +1,16 @@
-# バイク（数値・名前はサンプルなので書き換えてください）
+# バイク（お気に入りのルートはサンプルなので書き換えてください）
 
 # 愛車（複数 OK。上から順に表示）
 bikes:
-  - name: Model Name
-    maker: Maker
-    year: "2021"
-    cc: 650
-    note: 今の相棒。ツーリングもワインディングもこれ一台。
-  - name: Old Model
-    maker: Maker
-    year: "2016"
-    cc: 250
-    note: 最初の一台。
+  - name: ELIMINATOR
+    maker: Kawasaki
+    year: "2026"
+    cc: 398
+    note: カラーはブラック。
 
 # 数字まわり
 stats:
-  totalKm: 32450 # 総走行距離（メーターに表示）
+  totalKm: 3091 # 総走行距離（メーターに表示）
 
 # バイクの写真
 # content/bike/ に画像を入れると表示されます（書かなくても OK。書くとキャプションと並び順を指定できる）

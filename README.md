@@ -1,59 +1,49 @@
-# Personal Site
+# Ryoichi Hayashi
 
-Astro + GSAP + Lenis で作った個人サイト。
+**Software Engineer** · Tokyo, Japan
+_Full-stack engineer, full-stack curiosity._
 
-## 開発
+ソフトウェアエンジニア。
+プロダクト開発を軸に、フロントエンドからインフラまで幅広く触っています。
+最近の趣味はアプリ開発・バイク・カメラ。
 
-```bash
-npm install
-npm run dev      # http://localhost:4321
-npm run build    # dist/ に静的ファイルを出力
-```
+🌐 **[hryoichi.com](https://hryoichi.com)** — 動きのあるフル版はこちら
 
-## 内容の編集
+---
 
-**編集するのは `content/` フォルダだけ**です（コードを触る必要はありません）。
+## Career
 
-| ファイル | 内容 |
+| Period | |
 |---|---|
-| `content/profile.yaml` | 名前・肩書き・紹介文・SNS リンク |
-| `content/career.yaml` | 経歴 |
-| `content/skills.yaml` | スキル・資格 |
-| `content/travel.yaml` | 旅行先（緯度・経度で地球儀にピン） |
-| `content/photos.yaml` | 写真のタイトル・場所・並び順 |
-| `content/photos/` | 写真ファイル置き場 |
+| 2025 — Now | **Software Engineer** @ ソニーグループ株式会社<br>モバイルアプリの設計・開発。FE/BE、インフラまでフルスタックで担当。分析ダッシュボードなどの開発・構築も。 |
+| 2023 — 2025 | **M.Eng. in Electrical Engineering** — 京都大学大学院 工学研究科 電気工学専攻<br>高温超電導体で巻いたコイルの数値解析を研究。 |
+| 2022 — 2023 | **Undergraduate Research** — 京都大学 工学部（電子工学専攻の研究室で卒業研究）<br>二光子量子干渉を用いた断面撮像技術を研究。 |
+| 2019 — 2023 | **B.Eng. in Electrical and Electronic Engineering** — 京都大学 工学部 電気電子工学科 |
 
-- 写真は `content/photos/` に入れるだけで表示されます。スマホの写真をそのまま入れても、ビルド時に自動で縮小・WebP 変換されます（HEIC は非対応なので JPG で書き出してください）
-- `npm run dev` 中は保存するとブラウザに即反映されます
-- 書き間違い（必須項目の抜け、緯度が範囲外など）があると、どのファイルのどこが違うかをエラーで教えてくれます
+## Skills
 
-## 構成
+- **Languages** — TypeScript · Python · C/C++ · Java · Fortran90 · SQL
+- **Frontend** — React · Next.js · React Native · Vue.js
+- **Backend / Infra** — Node.js · Docker · AWS · Supabase
+- **Tools** — Vim · Git · GitHub Actions · Figma · Linux
 
-| ファイル | 内容 |
-|---|---|
-| `src/components/Hero.astro` | ファーストビュー（パーティクル背景・文字アニメ・タイピング） |
-| `src/components/About.astro` | 自己紹介・経歴タイムライン |
-| `src/components/Skills.astro` | マーキー・スキルカード・資格 |
-| `src/components/Hobbies.astro` | 写真の横スクロールギャラリー・旅行先の地球儀 |
-| `src/components/Contact.astro` | SNS リンク |
-| `src/scripts/main.ts` | スクロール連動アニメーション全般（GSAP ScrollTrigger） |
-| `src/scripts/heroCanvas.ts` | ヒーロー背景のパーティクルネットワーク |
-| `src/scripts/globe.ts` | ドット地球儀（Canvas） |
-| `src/data/profile.ts` | `content/` の読み込みと形式チェック |
-| `src/data/palette.ts` | カード等に割り当てるアクセントカラー |
+**Certifications** — TOEIC 880（2025）· 日商簿記3級（2025）
 
-`prefers-reduced-motion` が有効な環境ではアニメーションを抑えて表示します。
+## Hobbies
 
-## 公開（GitHub Pages）
+- 📷 **Photography** — 旅先で写真を撮るのが好き
+- ✈️ **Travel** — 16 places / 8 regions（Japan, Taiwan, Singapore, UK, Netherlands, Germany, France, USA）→ [Travel Log](https://hryoichi.com/travel/)
+- 🏍️ **Riding** — Kawasaki ELIMINATOR でツーリング
+- 📱 **App development** — 個人でのアプリ開発
 
-`main` に push すると GitHub Actions（`.github/workflows/deploy.yml`）がビルドして
-https://hryoichi.com に公開します（`rych-hysh.github.io` からは自動で転送）。
+## Contact
 
-### 独自ドメインの設定（設定済み）
+- ✉️ [ryoichi@hryoichi.com](mailto:ryoichi@hryoichi.com)
+- GitHub [@rych-hysh](https://github.com/rych-hysh)
+- X [@Ryo99_1001](https://x.com/Ryo99_1001)
+- Instagram [@ryoichi_hayashi](https://instagram.com/ryoichi_hayashi)
+- LinkedIn [in/ryoichi-hayashi](https://www.linkedin.com/in/ryoichi-hayashi)
 
-- DNS（お名前.com）
-  - `hryoichi.com` → A レコード `185.199.108.153` / `185.199.109.153` / `185.199.110.153` / `185.199.111.153`
-  - `www.hryoichi.com` → CNAME `rych-hysh.github.io`
-- GitHub：リポジトリの Settings → Pages の Custom domain に `hryoichi.com`、「Enforce HTTPS」オン
-- GitHub Actions で公開しているので `CNAME` ファイルは不要（使われない）
-- ドメインを変えるときは `astro.config.mjs` の `site` も合わせて変更
+---
+
+<sub>This repository is the source of [hryoichi.com](https://hryoichi.com) (Astro + GSAP). Development notes: [docs/development.md](docs/development.md)</sub>
