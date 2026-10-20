@@ -1,30 +1,30 @@
 # 基本情報
 name: Ryoichi Hayashi
 role: Software Engineer
-tagline: Building things that move — code, pixels, and photos.
-intro: ソフトウェアエンジニア。プロダクト開発を軸に、フロントエンドからインフラまで幅広く触っています。休日はカメラを持って旅に出ます。
+tagline: Full-stack engineer, full-stack curiosity.
+intro: ソフトウェアエンジニア。プロダクト開発を軸に、フロントエンドからインフラまで幅広く触っています。最近の趣味はアプリ開発・バイク・カメラ
 location: Tokyo, Japan
 
 # SNS・連絡先
 # icon は github / x / instagram / linkedin / note / mail から選ぶ
 socials:
   - label: GitHub
-    handle: "@username"
-    url: https://github.com/
+    handle: "@rych-hysh"
+    url: https://github.com/rych-hysh
     icon: github
   - label: X
-    handle: "@username"
-    url: https://x.com/
+    handle: "@Ryo99_1001"
+    url: https://x.com/@Ryo99_1001
     icon: x
   - label: Instagram
-    handle: "@username"
+    handle: "@ryoichi_hayashi"
     url: https://instagram.com/
     icon: instagram
   - label: LinkedIn
-    handle: in/username
-    url: https://linkedin.com/
+    handle: in/ryoichi-hayashi
+    url: https://www.linkedin.com/in/ryoichi-hayashi
     icon: linkedin
   - label: Mail
-    handle: hello@example.com
-    url: mailto:hello@example.com
+    handle: ryoichi@hryoichi.com
+    url: mailto:ryoichi@hryoichi.com
     icon: mail
