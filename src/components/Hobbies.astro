@@ -51,9 +51,9 @@ import Riding from "./Riding.astro";
         {
           trips.map((t, i) => (
             <li class="trip" data-reveal data-trip={i} tabindex="0" style={`--c: ${colorAt(i)}`}>
-              <span class="mono trip-year">{t.year}</span>
+              <span class="mono trip-no">{String(i + 1).padStart(2, "0")}</span>
               <span class="trip-place">{t.place}</span>
-              <span class="trip-country">{t.country}</span>
+              <span class="trip-region">{t.region !== t.place ? t.region : ""}</span>
               <span class="mono trip-coord">
                 {t.lat.toFixed(2)}, {t.lng.toFixed(2)}
               </span>
@@ -255,12 +255,12 @@ import Riding from "./Riding.astro";
 
   .trip {
     display: grid;
-    grid-template-columns: 56px 1fr auto;
+    grid-template-columns: 32px 1fr auto;
     grid-template-areas:
-      "year place coord"
-      "year country coord";
-    column-gap: 16px;
-    padding: 16px 8px;
+      "no place coord"
+      "no region coord";
+    column-gap: 14px;
+    padding: 10px 8px;
     border-bottom: 1px solid var(--line);
     cursor: pointer;
     outline: none;
@@ -276,8 +276,8 @@ import Riding from "./Riding.astro";
     background: linear-gradient(90deg, color-mix(in srgb, var(--c) 16%, transparent), transparent);
   }
 
-  .trip-year {
-    grid-area: year;
+  .trip-no {
+    grid-area: no;
     align-self: center;
     font-size: 0.8rem;
     color: color-mix(in srgb, var(--c) 72%, var(--ink));
@@ -285,13 +285,13 @@ import Riding from "./Riding.astro";
 
   .trip-place {
     grid-area: place;
-    font-size: 1.15rem;
+    font-size: 1.05rem;
     font-weight: 500;
     line-height: 1.3;
   }
 
-  .trip-country {
-    grid-area: country;
+  .trip-region {
+    grid-area: region;
     font-size: 0.85rem;
     color: var(--ink-2);
   }
@@ -301,6 +301,18 @@ import Riding from "./Riding.astro";
     align-self: center;
     font-size: 0.75rem;
     color: var(--ink-3);
+  }
+
+  /* PC では一覧をスクロールしている間も地球儀を画面に残す */
+  @media (min-width: 861px) {
+    .travel-grid {
+      align-items: start;
+    }
+
+    .globe-wrap {
+      position: sticky;
+      top: max(96px, calc(50vh - 260px));
+    }
   }
 
   @media (max-width: 860px) {

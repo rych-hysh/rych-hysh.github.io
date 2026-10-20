@@ -28,7 +28,7 @@ import { colorAt } from "../data/palette";
               <p class="tl-period mono">{c.period}</p>
               <h3 class="tl-title">{c.title}</h3>
               <p class="tl-org">{c.org}</p>
-              <p class="tl-desc">{c.description}</p>
+              {c.description && <p class="tl-desc">{c.description}</p>}
             </li>
           ))
         }

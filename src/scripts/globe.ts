@@ -10,7 +10,7 @@ import type { Topology, GeometryCollection } from "topojson-specification";
 import type { Feature, MultiPolygon, Polygon } from "geojson";
 import land from "world-atlas/land-110m.json";
 
-type Trip = { place: string; country: string; year: string; lat: number; lng: number };
+type Trip = { place: string; region: string; lat: number; lng: number };
 
 const RAD = Math.PI / 180;
 
@@ -455,7 +455,9 @@ export function initGlobe(canvas: HTMLCanvasElement, reduced: boolean) {
       onUpdate: redrawIfIdle,
     });
     if (label) {
-      label.textContent = `${trip.place}, ${trip.country} — ${trip.year}`;
+      // 地名と地域名が同じ（Singapore など）なら地域名は省く
+      label.textContent =
+        trip.region && trip.region !== trip.place ? `${trip.place}, ${trip.region}` : trip.place;
       label.classList.add("show");
     }
   }

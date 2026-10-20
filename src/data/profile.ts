@@ -85,8 +85,7 @@ export const trips = load(
   z.array(
     z.object({
       place: z.string(),
-      country: z.string().default(""),
-      year: text.default(""),
+      region: z.string().default(""),
       lat: z.number().min(-90).max(90),
       lng: z.number().min(-180).max(180),
     }),
