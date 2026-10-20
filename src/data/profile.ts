@@ -111,12 +111,31 @@ export const bike = load(
       .default([]),
     stats: z.object({
       totalKm: z.number().min(0),
-      longestDayKm: z.number().min(0).default(0),
-      prefectures: z.number().int().min(0).max(47).default(0),
     }),
+    photos: z.array(z.object({ file: z.string(), caption: z.string().default("") })).default([]),
     routes: z.array(z.object({ name: z.string(), area: z.string().default(""), km: z.number().positive() })).default([]),
   }),
 );
+
+// バイクの写真（content/bike/）。photos.yaml と同じく、リストにない画像は最後に追加
+const bikeImages = import.meta.glob<{ default: ImageMetadata }>(
+  "../../content/bike/*.{jpg,jpeg,JPG,JPEG,png,PNG,webp,avif,AVIF}",
+  { eager: true },
+);
+const bikeByName = new Map(
+  Object.entries(bikeImages).map(([path, mod]) => [path.split("/").pop()!, mod.default]),
+);
+export const bikePhotos: { image: ImageMetadata; caption: string }[] = [
+  ...bike.photos.map((m) => {
+    const image = bikeByName.get(m.file);
+    if (!image) throw new Error(`content/bike.yaml の写真 "${m.file}" が content/bike/ に見つかりません`);
+    return { image, caption: m.caption };
+  }),
+  ...[...bikeByName.entries()]
+    .filter(([name]) => !bike.photos.some((m) => m.file === name))
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([, image]) => ({ image, caption: "" })),
+];
 
 // ---------------------------------------------------------------- photos
 const photoMeta = load(

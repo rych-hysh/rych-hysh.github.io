@@ -2,7 +2,11 @@
 name: Ryoichi Hayashi
 role: Software Engineer
 tagline: Full-stack engineer, full-stack curiosity.
-intro: ソフトウェアエンジニア。プロダクト開発を軸に、フロントエンドからインフラまで幅広く触っています。最近の趣味はアプリ開発・バイク・カメラ。
+# intro は改行した位置でそのまま改行されます（| の次の行から、先頭をそろえて書く）
+intro: |-
+  ソフトウェアエンジニア。
+  プロダクト開発を軸に、フロントエンドからインフラまで幅広く触っています。
+  最近の趣味はアプリ開発・バイク・カメラ。
 location: Tokyo, Japan
 
 # SNS・連絡先

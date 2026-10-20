@@ -1,49 +1,62 @@
 ---
-import { profile, socials, type Social } from "../data/profile";
+// Contact：メールアドレスを主役に（コピーボタン付き）、SNS はアイコンのドックで
+import { profile, socials } from "../data/profile";
+import { icons } from "../data/icons";
 import { colorAt } from "../data/palette";
 
-const icons: Record<Social["icon"], string> = {
-  github:
-    "M12 2C6.48 2 2 6.58 2 12.22c0 4.5 2.87 8.32 6.84 9.67.5.1.68-.22.68-.49v-1.7c-2.78.62-3.37-1.37-3.37-1.37-.45-1.18-1.11-1.49-1.11-1.49-.91-.63.07-.62.07-.62 1 .07 1.53 1.06 1.53 1.06.89 1.57 2.34 1.12 2.91.85.09-.66.35-1.12.63-1.37-2.22-.26-4.56-1.14-4.56-5.07 0-1.12.39-2.04 1.03-2.76-.1-.26-.45-1.3.1-2.71 0 0 .84-.28 2.75 1.05a9.4 9.4 0 0 1 5 0c1.91-1.33 2.75-1.05 2.75-1.05.55 1.41.2 2.45.1 2.71.64.72 1.03 1.64 1.03 2.76 0 3.94-2.34 4.8-4.57 5.06.36.32.68.94.68 1.9v2.82c0 .27.18.6.69.49A10.2 10.2 0 0 0 22 12.22C22 6.58 17.52 2 12 2Z",
-  x: "M17.75 3h3.07l-6.7 7.66L22 21h-6.17l-4.83-6.32L5.47 21H2.4l7.17-8.2L2 3h6.33l4.36 5.77L17.75 3Zm-1.08 16.2h1.7L7.4 4.74H5.58l11.09 14.46Z",
-  instagram:
-    "M12 2.2c3.2 0 3.58.01 4.85.07 3.25.15 4.77 1.69 4.92 4.92.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.15 3.23-1.66 4.77-4.92 4.92-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-3.26-.15-4.77-1.7-4.92-4.92C2.17 15.58 2.16 15.2 2.16 12s.01-3.58.07-4.85C2.38 3.92 3.9 2.38 7.15 2.23 8.42 2.17 8.8 2.16 12 2.16ZM12 6.86a5.14 5.14 0 1 0 0 10.28 5.14 5.14 0 0 0 0-10.28Zm0 8.48a3.34 3.34 0 1 1 0-6.68 3.34 3.34 0 0 1 0 6.68Zm5.34-9.9a1.2 1.2 0 1 0 0 2.4 1.2 1.2 0 0 0 0-2.4Z",
-  linkedin:
-    "M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12ZM7.12 20.45H3.56V9h3.56v11.45ZM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0Z",
-  note: "M4 3h11l5 5v13H4V3Zm10 1.5V9h4.5L14 4.5ZM7 12h10v1.5H7V12Zm0 3.5h10V17H7v-1.5Z",
-  mail: "M3 5h18a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Zm9 7.2L4.4 7H4v.6l8 5.4 8-5.4V7h-.4L12 12.2Z",
-};
+const mail = socials.find((s) => s.icon === "mail");
+const others = socials.filter((s) => s.icon !== "mail");
 ---
 
 <section class="section contact" id="contact">
   <div class="container">
     <div class="section-head">
       <span class="section-index">04 /</span>
-      <h2 class="section-title">Let's <span class="grad">connect</span></h2>
+      <h2 class="section-title"><span class="grad">Contact</span></h2>
     </div>
 
-    <ul class="socials">
+    <div class="cta">
       {
-        socials.map((s, i) => (
-          <li data-reveal style={`--c: ${colorAt(i)}; --c2: ${colorAt(i + 1)}`}>
-            <a
-              class="social card"
-              href={s.url}
-              target={s.url.startsWith("mailto:") ? undefined : "_blank"}
-              rel="noopener"
-              data-magnetic
-            >
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d={icons[s.icon]} fill="currentColor" />
-              </svg>
-              <span class="s-label">{s.label}</span>
-              <span class="s-handle mono">{s.handle}</span>
-              <span class="arrow" aria-hidden="true">↗</span>
+        mail && (
+          <div class="cta-mail" data-reveal>
+            <p class="cta-kicker mono">// say hello</p>
+            <a class="cta-address" href={mail.url}>
+              {mail.handle}
             </a>
-          </li>
-        ))
+            <button class="cta-copy mono" type="button" data-copy={mail.handle} aria-label="メールアドレスをコピー">
+              copy
+            </button>
+          </div>
+        )
       }
-    </ul>
+
+      <ul class="dock" data-reveal>
+        {
+          others.map((s, i) => (
+            <li style={`--c: ${colorAt(i + 1)}`}>
+              <a
+                class="dock-btn"
+                href={s.url}
+                target="_blank"
+                rel="noopener"
+                aria-label={`${s.label}（${s.handle}）`}
+                data-magnetic
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d={icons[s.icon]} fill="currentColor" />
+                </svg>
+                <span class="dock-tip mono" aria-hidden="true">
+                  {s.handle}
+                </span>
+                <span class="dock-name mono" aria-hidden="true">
+                  {s.label}
+                </span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
   </div>
 
   <footer class="container footer mono">
@@ -57,84 +70,170 @@ const icons: Record<Social["icon"], string> = {
     padding-bottom: 32px;
   }
 
-  .socials {
+  .cta {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 16px;
-    margin: 0 0 clamp(96px, 14vw, 160px);
+    gap: 36px;
+    justify-items: start;
+    margin-bottom: clamp(96px, 14vw, 160px);
+  }
+
+  .cta-mail {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px 18px;
+  }
+
+  .cta-kicker {
+    width: 100%;
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--ink-3);
+  }
+
+  .cta-address {
+    position: relative;
+    font-size: clamp(1.7rem, 5.5vw, 4rem);
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.035em;
+    background: var(--grad);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    overflow-wrap: anywhere;
+  }
+
+  /* ホバーでグラデーションの下線が伸びる */
+  .cta-address::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -2px;
+    height: 3px;
+    background: var(--grad);
+    border-radius: 2px;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.45s cubic-bezier(0.7, 0, 0.2, 1);
+  }
+
+  .cta-address:hover::after,
+  .cta-address:focus-visible::after {
+    transform: scaleX(1);
+  }
+
+  .cta-copy {
+    padding: 6px 14px;
+    font-size: 0.8rem;
+    color: var(--ink-2);
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    cursor: pointer;
+    transition:
+      background 0.2s,
+      color 0.2s;
+  }
+
+  .cta-copy:hover,
+  .cta-copy:focus-visible {
+    color: #fff;
+    background: var(--ink);
+  }
+
+  .dock {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin: 0;
     padding: 0;
     list-style: none;
   }
 
-  .social {
+  .dock-btn {
     position: relative;
     display: grid;
-    gap: 4px;
-    padding: 24px;
-    overflow: hidden;
+    place-items: center;
+    width: 64px;
+    height: 64px;
+    color: var(--ink);
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 20px;
     transition:
-      color 0.35s,
-      border-color 0.35s;
-    isolation: isolate;
+      color 0.3s,
+      background 0.3s,
+      border-color 0.3s,
+      translate 0.35s cubic-bezier(0.3, 1.6, 0.5, 1),
+      box-shadow 0.3s;
   }
 
-  .social::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    background: linear-gradient(135deg, var(--c), var(--c2));
-    transform: translateY(101%);
-    transition: transform 0.45s cubic-bezier(0.7, 0, 0.2, 1);
+  .dock-btn svg {
+    width: 26px;
+    height: 26px;
   }
 
-  .social:hover,
-  .social:focus-visible {
+  .dock-btn:hover,
+  .dock-btn:focus-visible {
     color: #fff;
+    background: var(--c);
     border-color: transparent;
+    translate: 0 -6px;
+    box-shadow: 0 16px 30px -14px var(--c);
   }
 
-  .social:hover::before,
-  .social:focus-visible::before {
-    transform: translateY(0);
-  }
-
-  svg {
-    width: 28px;
-    height: 28px;
-    margin-bottom: 20px;
-    color: color-mix(in srgb, var(--c) 72%, var(--ink));
-    transition: color 0.35s;
-  }
-
-  .social:hover svg,
-  .social:focus-visible svg {
-    color: #fff;
-  }
-
-  .s-label {
-    font-size: 1.3rem;
-    font-weight: 700;
-  }
-
-  .s-handle {
-    font-size: 0.8rem;
-    opacity: 0.7;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .arrow {
+  /* アカウント名のツールチップ（ボタンの下に出す） */
+  .dock-tip {
     position: absolute;
-    top: 20px;
-    right: 22px;
-    font-size: 1.3rem;
-    transition: transform 0.35s;
+    top: calc(100% + 10px);
+    left: 50%;
+    z-index: 1;
+    padding: 4px 10px;
+    font-size: 0.72rem;
+    color: #fff;
+    white-space: nowrap;
+    background: var(--ink);
+    border-radius: 999px;
+    opacity: 0;
+    translate: -50% -4px;
+    pointer-events: none;
+    transition:
+      opacity 0.2s,
+      translate 0.2s;
   }
 
-  .social:hover .arrow {
-    transform: translate(3px, -3px) rotate(0deg) scale(1.15);
+  .dock-btn:hover .dock-tip,
+  .dock-btn:focus-visible .dock-tip {
+    opacity: 1;
+    translate: -50% 0;
+  }
+
+  /* タッチ端末ではツールチップの代わりに、ボタンの下にサービス名を常に表示 */
+  .dock-name {
+    display: none;
+  }
+
+  @media (hover: none) {
+    .dock {
+      row-gap: 34px;
+    }
+
+    .dock-tip {
+      display: none;
+    }
+
+    .dock-name {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 50%;
+      display: block;
+      font-size: 0.7rem;
+      color: var(--ink-3);
+      white-space: nowrap;
+      translate: -50% 0;
+    }
   }
 
   .footer {

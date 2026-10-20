@@ -16,8 +16,12 @@ bikes:
 # 数字まわり
 stats:
   totalKm: 32450 # 総走行距離（メーターに表示）
-  longestDayKm: 620 # 1日の最長距離
-  prefectures: 28 # 走った都道府県の数（47 に対するリングで表示）
+
+# バイクの写真
+# content/bike/ に画像を入れると表示されます（書かなくても OK。書くとキャプションと並び順を指定できる）
+photos: []
+#  - file: my-bike.jpg
+#    caption: 箱根にて
 
 # お気に入りのルート（距離のバーで表示）
 routes:

@@ -501,7 +501,7 @@ export function initGlobe(canvas: HTMLCanvasElement, reduced: boolean) {
   canvas.addEventListener("pointermove", (e) => {
     if (!dragging) return;
     view.lng += ((e.clientX - lastX) * 0.4) / view.zoom;
-    view.lat = Math.max(-80, Math.min(80, view.lat - ((e.clientY - lastY) * 0.3) / view.zoom));
+    view.lat = Math.max(-80, Math.min(80, view.lat + ((e.clientY - lastY) * 0.3) / view.zoom));
     lastX = e.clientX;
     lastY = e.clientY;
     redrawIfIdle();

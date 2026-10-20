@@ -1,0 +1,316 @@
+---
+// 旅行先：地球儀＋一覧。地球儀には常に全件のピンを表示し、一覧は limit 件まで（省略時は全件を地域ごとに表示）
+import { trips } from "../data/profile";
+import { colorAt, palette } from "../data/palette";
+
+interface Props {
+  /** 一覧に出す件数。指定すると「すべて見る」リンクを付ける */
+  limit?: number;
+}
+
+const { limit } = Astro.props;
+const indexed = trips.map((t, i) => ({ ...t, i }));
+const shown = limit ? indexed.slice(0, limit) : indexed;
+const rest = limit ? trips.length - shown.length : 0;
+
+// 全件表示のときは地域ごとにまとめる（YAML に出てくる順）
+const groups = limit
+  ? [{ region: "", items: shown }]
+  : [...new Set(indexed.map((t) => t.region))].map((region) => ({
+      region,
+      items: indexed.filter((t) => t.region === region),
+    }));
+---
+
+<div class:list={["travel-grid", { "is-full": !limit }]}>
+  <div class="globe-wrap" data-reveal data-anim-scope>
+    <canvas
+      class="globe"
+      data-globe
+      data-trips={JSON.stringify(trips)}
+      data-colors={JSON.stringify(palette)}
+      aria-label="訪れた場所を示す地球儀"></canvas>
+    <span class="globe-label mono" data-globe-label></span>
+  </div>
+
+  <div class="trip-list">
+    {
+      groups.map((g) => (
+        <section class="trip-group">
+          {g.region && (
+            <h3 class="trip-group-title mono">
+              {g.region} <span>{g.items.length}</span>
+            </h3>
+          )}
+          <ol class="trips">
+            {g.items.map((t) => (
+              <li class="trip" data-reveal data-trip={t.i} tabindex="0" style={`--c: ${colorAt(t.i)}`}>
+                <span class="mono trip-no">{String(t.i + 1).padStart(2, "0")}</span>
+                <span class="trip-place">{t.place}</span>
+                <span class="trip-region">{limit && t.region !== t.place ? t.region : ""}</span>
+                <span class="mono trip-coord">
+                  {t.lat.toFixed(2)}, {t.lng.toFixed(2)}
+                </span>
+              </li>
+            ))}
+          </ol>
+        </section>
+      ))
+    }
+    {
+      rest > 0 && (
+        <a href="/travel/" class="trip-more" data-reveal>
+          <span class="trip-more-count">+{rest}</span>
+          <span class="trip-more-text">
+            View all {trips.length} places
+            <small class="mono">全 {trips.length} か所を見る</small>
+          </span>
+          <span class="trip-more-arrow" aria-hidden="true">→</span>
+        </a>
+      )
+    }
+  </div>
+</div>
+
+<style>
+  .travel-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(32px, 6vw, 80px);
+    align-items: center;
+  }
+
+  .globe-wrap {
+    position: relative;
+    isolation: isolate;
+    aspect-ratio: 1;
+    width: 100%;
+    max-width: 520px;
+    justify-self: center;
+  }
+
+  .globe-wrap::after {
+    content: "";
+    position: absolute;
+    inset: 4%;
+    z-index: -1;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, var(--cyan), var(--violet), var(--pink), var(--coral), var(--yellow), var(--mint), var(--cyan));
+    filter: blur(40px);
+    opacity: 0.35;
+    animation: spin 18s linear infinite;
+  }
+
+  @keyframes spin {
+    to {
+      rotate: 360deg;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .globe-wrap::after {
+      animation: none;
+    }
+  }
+
+  .globe-wrap::before {
+    content: "";
+    position: absolute;
+    inset: 8%;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #ffffff, #dff4fb 50%, #c4e8f5 100%);
+    box-shadow:
+      0 40px 80px -30px rgba(58, 123, 255, 0.45),
+      inset -20px -30px 60px rgba(58, 123, 255, 0.15);
+  }
+
+  .globe {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    cursor: grab;
+    touch-action: pan-y;
+  }
+
+  .globe:active {
+    cursor: grabbing;
+  }
+
+  .globe-label {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    padding: 4px 12px;
+    font-size: 0.8rem;
+    color: #fff;
+    background: var(--ink);
+    border-radius: 999px;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.3s;
+    white-space: nowrap;
+  }
+
+  .globe-label.show {
+    opacity: 1;
+  }
+
+  .trips {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--line);
+  }
+
+  .trip {
+    display: grid;
+    grid-template-columns: 32px 1fr auto;
+    grid-template-areas:
+      "no place coord"
+      "no region coord";
+    column-gap: 14px;
+    padding: 10px 8px;
+    border-bottom: 1px solid var(--line);
+    cursor: pointer;
+    outline: none;
+    transition:
+      background 0.25s,
+      padding 0.25s;
+  }
+
+  .trip:hover,
+  .trip:focus-visible,
+  .trip.active {
+    padding-left: 16px;
+    background: linear-gradient(90deg, color-mix(in srgb, var(--c) 16%, transparent), transparent);
+  }
+
+  .trip-no {
+    grid-area: no;
+    align-self: center;
+    font-size: 0.8rem;
+    color: color-mix(in srgb, var(--c) 72%, var(--ink));
+  }
+
+  .trip-place {
+    grid-area: place;
+    font-size: 1.05rem;
+    font-weight: 500;
+    line-height: 1.3;
+  }
+
+  .trip-region {
+    grid-area: region;
+    font-size: 0.85rem;
+    color: var(--ink-2);
+  }
+
+  .trip-coord {
+    grid-area: coord;
+    align-self: center;
+    font-size: 0.75rem;
+    color: var(--ink-3);
+  }
+
+  /* 全件表示のページでは、一覧をスクロールしている間も地球儀を画面に残す（PC） */
+  @media (min-width: 861px) {
+    .travel-grid.is-full {
+      align-items: start;
+    }
+
+    .is-full .globe-wrap {
+      position: sticky;
+      top: max(96px, calc(50vh - 260px));
+    }
+  }
+
+  @media (max-width: 860px) {
+    .travel-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  /* ---------- 「すべて見る」 */
+  .trip-more {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 20px;
+    padding: 16px 20px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    transition:
+      border-color 0.3s,
+      box-shadow 0.3s,
+      translate 0.3s;
+  }
+
+  .trip-more:hover,
+  .trip-more:focus-visible {
+    border-color: color-mix(in srgb, var(--coral) 50%, transparent);
+    box-shadow: 0 18px 40px -24px var(--coral);
+    translate: 0 -2px;
+  }
+
+  .trip-more-count {
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    background: linear-gradient(120deg, var(--coral), var(--pink));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .trip-more-text {
+    display: grid;
+    font-weight: 500;
+  }
+
+  .trip-more-text small {
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: var(--ink-3);
+  }
+
+  .trip-more-arrow {
+    margin-left: auto;
+    font-size: 1.3rem;
+    transition: translate 0.3s;
+  }
+
+  .trip-more:hover .trip-more-arrow {
+    translate: 4px 0;
+  }
+
+  /* ---------- 全件表示（地域ごと） */
+  .trip-group + .trip-group {
+    margin-top: 28px;
+  }
+
+  .trip-group-title {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin: 0 0 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    color: var(--ink-2);
+  }
+
+  /* 地域ごとの表示では地域名は見出しに出ているので、行は 1 段に */
+  .is-full .trip {
+    grid-template-areas: "no place coord";
+    align-items: center;
+  }
+
+  .is-full .trip-region {
+    display: none;
+  }
+
+  .trip-group-title span {
+    font-weight: 400;
+    color: var(--ink-3);
+  }
+</style>

@@ -1,0 +1,80 @@
+---
+import Base from "../layouts/Base.astro";
+import Nav from "../components/Nav.astro";
+import Travel from "../components/Travel.astro";
+import { profile, trips } from "../data/profile";
+
+const regions = new Set(trips.map((t) => t.region)).size;
+---
+
+<Base title={`Travel — ${profile.name}`} description={`${profile.name} が訪れた ${trips.length} か所`}>
+  <Nav />
+  <main>
+    <section class="section travel-page">
+      <div class="container">
+        <a href="/#hobbies" class="back mono">← back to home</a>
+        <div class="section-head">
+          <span class="section-index">03 /</span>
+          <h1 class="section-title">Travel <span class="grad">Log</span></h1>
+        </div>
+        <p class="summary mono">
+          <span>{trips.length}</span> places · <span>{regions}</span> regions
+        </p>
+        <Travel />
+      </div>
+    </section>
+  </main>
+  <footer class="container footer mono">
+    <span>© {new Date().getFullYear()} {profile.name}</span>
+    <a href="/">home ↑</a>
+  </footer>
+</Base>
+
+<script>
+  import "../scripts/main";
+</script>
+
+<style>
+  .travel-page {
+    --accent: var(--coral);
+    --accent-2: var(--pink);
+    padding-top: clamp(120px, 14vw, 160px);
+  }
+
+  .back {
+    display: inline-block;
+    margin-bottom: 32px;
+    font-size: 0.85rem;
+    color: var(--ink-3);
+    transition: color 0.2s;
+  }
+
+  .back:hover {
+    color: var(--coral);
+  }
+
+  .summary {
+    margin: calc(-1 * clamp(16px, 3vw, 36px)) 0 48px;
+    font-size: 0.9rem;
+    color: var(--ink-3);
+  }
+
+  .summary span {
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  .footer {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 24px;
+    padding-bottom: 32px;
+    font-size: 0.8rem;
+    color: var(--ink-3);
+    border-top: 1px solid var(--line);
+  }
+
+  .footer a:hover {
+    color: var(--coral);
+  }
+</style>

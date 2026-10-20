@@ -37,10 +37,12 @@ if (!reduced) {
   gsap.ticker.lagSmoothing(0);
 }
 
-// アンカーリンクは Lenis 経由でスクロール
-$$<HTMLAnchorElement>('a[href^="#"]').forEach((a) => {
+// アンカーリンク（#xxx / 同じページの /#xxx）は Lenis 経由でスクロール
+$$<HTMLAnchorElement>('a[href^="#"], a[href^="/#"]').forEach((a) => {
   a.addEventListener("click", (e) => {
-    const target = $(a.getAttribute("href")!);
+    const url = new URL(a.href);
+    if (url.pathname !== location.pathname) return; // 別ページなら普通に遷移
+    const target = url.hash ? $(url.hash) : null;
     if (!target) return;
     e.preventDefault();
     if (lenis) lenis.scrollTo(target as HTMLElement, { offset: 0, duration: 1.4 });
@@ -53,10 +55,11 @@ const heroCanvas = $<HTMLCanvasElement>(".hero-canvas");
 if (heroCanvas) initHeroCanvas(heroCanvas, reduced);
 
 const typing = $("[data-typing]");
+const hero = $(".hero");
 
 if (reduced) {
   if (typing) typing.textContent = typing.dataset.typing ?? "";
-} else {
+} else if (hero) {
   const lines = $$("[data-split]");
   const chars = lines.flatMap((l) => {
     const c = splitChars(l);
@@ -104,7 +107,6 @@ if (reduced) {
   });
 
   // 背景の blob はマウスにゆるく追従
-  const hero = $(".hero")!;
   const b1x = gsap.quickTo(".blob-1", "x", { duration: 1.6, ease: "power3" });
   const b1y = gsap.quickTo(".blob-1", "y", { duration: 1.6, ease: "power3" });
   const b2x = gsap.quickTo(".blob-2", "x", { duration: 2.2, ease: "power3" });
@@ -168,11 +170,13 @@ if (!reduced) {
   });
 
   // ---------------------------------------------------------------- timeline line
-  gsap.to(".timeline-fill", {
-    scaleY: 1,
-    ease: "none",
-    scrollTrigger: { trigger: ".timeline", start: "top 70%", end: "bottom 60%", scrub: true },
-  });
+  if ($(".timeline")) {
+    gsap.to(".timeline-fill", {
+      scaleY: 1,
+      ease: "none",
+      scrollTrigger: { trigger: ".timeline", start: "top 70%", end: "bottom 60%", scrub: true },
+    });
+  }
   $$(".tl-node").forEach((node) => {
     gsap.from(node, {
       scale: 0,
@@ -183,9 +187,9 @@ if (!reduced) {
   });
 
   // ---------------------------------------------------------------- gallery (横スクロール)
+  const gallery = $("[data-gallery]");
   const mm = gsap.matchMedia();
-  mm.add("(min-width: 761px)", () => {
-    const gallery = $("[data-gallery]")!;
+  if (gallery) mm.add("(min-width: 761px)", () => {
     const gTrack = $("[data-gallery-track]")!;
     const distance = () => gTrack.scrollWidth - window.innerWidth;
 
@@ -222,7 +226,7 @@ if (!reduced) {
       );
     });
   });
-  mm.add("(max-width: 760px)", () => {
+  if (gallery) mm.add("(max-width: 760px)", () => {
     gsap.from(".photo", {
       autoAlpha: 0,
       x: 60,
@@ -278,6 +282,20 @@ $$("[data-skill-card]").forEach((card) => {
       e.preventDefault();
       toggle();
     }
+  });
+});
+
+// ---------------------------------------------------------------- copy to clipboard
+$$<HTMLButtonElement>("[data-copy]").forEach((btn) => {
+  const label = btn.textContent;
+  btn.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(btn.dataset.copy ?? "");
+      btn.textContent = "copied ✓";
+    } catch {
+      btn.textContent = "failed";
+    }
+    setTimeout(() => (btn.textContent = label), 1600);
   });
 });
 

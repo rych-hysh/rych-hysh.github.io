@@ -51,6 +51,10 @@ import { colorAt } from "../data/palette";
   }
 
   .intro-text {
+    /* YAML で改行した位置で改行する。自動の折り返しは文節単位で */
+    white-space: pre-line;
+    word-break: auto-phrase;
+    text-wrap: pretty;
     margin: 0 0 32px;
     font-family: var(--font-jp);
     font-size: clamp(1.15rem, 2.2vw, 1.6rem);
