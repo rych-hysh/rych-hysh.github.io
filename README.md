@@ -47,13 +47,13 @@ npm run build    # dist/ に静的ファイルを出力
 ## 公開（GitHub Pages）
 
 `main` に push すると GitHub Actions（`.github/workflows/deploy.yml`）がビルドして
-https://rych-hysh.github.io に公開します。
+https://hryoichi.com に公開します（`rych-hysh.github.io` からは自動で転送）。
 
-### 独自ドメインにする場合
+### 独自ドメインの設定（設定済み）
 
-1. `public/CNAME` を作り、ドメイン名を 1 行だけ書く（例: `example.com`）
-2. `astro.config.mjs` の `site` を `https://example.com` に変更
-3. ドメインの DNS を設定
-   - `www.example.com` のようなサブドメイン → CNAME レコードで `rych-hysh.github.io` を指す
-   - `example.com`（apex）→ A レコードで `185.199.108.153` / `185.199.109.153` / `185.199.110.153` / `185.199.111.153`
-4. GitHub のリポジトリ → Settings → Pages で Custom domain を確認し、「Enforce HTTPS」をオン
+- DNS（お名前.com）
+  - `hryoichi.com` → A レコード `185.199.108.153` / `185.199.109.153` / `185.199.110.153` / `185.199.111.153`
+  - `www.hryoichi.com` → CNAME `rych-hysh.github.io`
+- GitHub：リポジトリの Settings → Pages の Custom domain に `hryoichi.com`、「Enforce HTTPS」オン
+- GitHub Actions で公開しているので `CNAME` ファイルは不要（使われない）
+- ドメインを変えるときは `astro.config.mjs` の `site` も合わせて変更
