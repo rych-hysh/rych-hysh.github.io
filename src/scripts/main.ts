@@ -40,13 +40,26 @@ if (!reduced) {
 // アンカーリンク（#xxx / 同じページの /#xxx）は Lenis 経由でスクロール
 $$<HTMLAnchorElement>('a[href^="#"], a[href^="/#"]').forEach((a) => {
   a.addEventListener("click", (e) => {
+    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
     const url = new URL(a.href);
-    if (url.pathname !== location.pathname) return; // 別ページなら普通に遷移
-    const target = url.hash ? $(url.hash) : null;
+    if (url.pathname !== location.pathname || url.search !== location.search) return; // 別ページなら普通に遷移
+    const target = url.hash ? $<HTMLElement>(url.hash) : null;
     if (!target) return;
     e.preventDefault();
-    if (lenis) lenis.scrollTo(target as HTMLElement, { offset: 0, duration: 1.4 });
-    else target.scrollIntoView();
+    if (location.hash !== url.hash) history.pushState(null, "", url.hash);
+    const focusTarget = () => {
+      if (!target.hasAttribute("tabindex")) {
+        target.setAttribute("tabindex", "-1");
+        target.addEventListener("blur", () => target.removeAttribute("tabindex"), { once: true });
+      }
+      target.focus({ preventScroll: true });
+    };
+    // Lenis とブラウザーの両方が CSS の scroll-margin-top を参照する。
+    if (lenis) lenis.scrollTo(target, { duration: 1.4, onComplete: focusTarget });
+    else {
+      target.scrollIntoView();
+      focusTarget();
+    }
   });
 });
 
@@ -79,6 +92,7 @@ if (reduced) {
   // タイピング演出
   if (typing) {
     const full = typing.dataset.typing ?? "";
+    typing.textContent = "";
     const state = { n: 0 };
     tl.to(
       state,
