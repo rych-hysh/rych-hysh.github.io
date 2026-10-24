@@ -97,7 +97,14 @@ body::before {
 
 .section {
   position: relative;
+  scroll-margin-top: 96px;
   padding: clamp(96px, 14vw, 180px) 0;
+}
+
+@media (max-width: 640px) {
+  .section {
+    scroll-margin-top: 128px;
+  }
 }
 
 .section-head {
