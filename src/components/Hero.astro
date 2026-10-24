@@ -25,7 +25,6 @@ const last = rest.join(" ");
       <span class="role-label">{profile.role}</span>
       <span class="role-animation" aria-hidden="true"><span data-typing={profile.role}>{profile.role}</span><span class="caret">▍</span></span>
     </p>
-    <p class="hero-intro">{profile.heroIntro ?? profile.intro}</p>
     <p class="hero-tagline">{profile.tagline}</p>
     <nav class="hero-links" aria-label="興味のある内容へ">
       <a class="hero-link hero-link-primary" href="#about">
@@ -211,15 +210,6 @@ const last = rest.join(" ");
     white-space: nowrap;
   }
 
-  .hero-intro {
-    max-width: 34em;
-    margin: 20px 0 6px;
-    font-family: var(--font-jp);
-    font-size: clamp(1rem, 1.6vw, 1.2rem);
-    line-height: 1.9;
-    text-wrap: pretty;
-  }
-
   .hero-role > :first-child,
   .caret {
     color: var(--pink);
@@ -379,11 +369,6 @@ const last = rest.join(" ");
 
     .hero-role {
       margin-top: 16px;
-    }
-
-    .hero-intro {
-      margin-top: 12px;
-      line-height: 1.7;
     }
 
     .hero-tagline {

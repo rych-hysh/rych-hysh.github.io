@@ -46,7 +46,6 @@ const profileData = load(
     name: z.string(),
     role: z.string(),
     tagline: z.string(),
-    heroIntro: z.string().optional(),
     intro: z.string(),
     location: z.string(),
     socials: z.array(socialSchema).default([]),

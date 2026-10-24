@@ -2,8 +2,6 @@
 name: Ryoichi Hayashi
 role: Software Engineer
 tagline: Full-stack engineer, full-stack curiosity.
-# ファーストビューの短い紹介文（既存の intro を要約）
-heroIntro: プロダクト開発を軸に、フロントエンドからインフラまで。
 # intro は改行した位置でそのまま改行されます（| の次の行から、先頭をそろえて書く）
 intro: |-
   ソフトウェアエンジニア。
