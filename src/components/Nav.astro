@@ -1,9 +1,10 @@
 ---
-import { profile } from "../data/profile";
+import { profile, projects } from "../data/profile";
 
 const links = [
   { href: "/#about", label: "About" },
   { href: "/#skills", label: "Skills" },
+  ...(projects.length > 0 ? [{ href: "/#projects", label: "Works" }] : []),
   { href: "/#hobbies", label: "Hobbies" },
   { href: "/#contact", label: "Contact" },
 ];

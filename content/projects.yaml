@@ -1,4 +1,4 @@
-# Tottoki は本人のプロダクト。sample: true の作品は架空の記入例です。
+# Tottoki と Typing Game v2 は本人のプロダクト。sample: true の作品は架空の記入例です。
 # 実際の作品への差し替え方・画像の置き方は docs/projects.md を参照。
 # published: true の作品だけ表示します（省略時は false）。
 # 非公開情報や未承認の画像は、このリポジトリに保存しないでください。
@@ -22,6 +22,28 @@
     file: tottoki-og.png
     alt: Tottokiの公式紹介画像。「行きたいを、とっとく。」というメッセージとアプリアイコン。
     caption: Tottoki — 行きたいを、とっとく。
+
+- id: typing-game
+  published: true
+  sample: false
+  name: Typing Game v2
+  summary: |-
+    学習用に制作した、最初期の個人プロダクト。
+    フレームワークを使わず、HTML5・CSS3・JavaScriptのみで実装した、PC専用のタイピングゲームです。
+  role: 個人開発
+  status: Webゲーム / PCのみ対応
+  features:
+    - Enterキーでプレイを開始し、Escキーでタイトル画面へ戻るシンプルな操作
+    - 平均KPM（1分間のキー入力回数）と正確率からスコアを計算
+    - プレイ後にランク・入力速度・正確率を結果画面で確認
+  stack: [HTML5, CSS3, JavaScript]
+  links:
+    - label: タイピングゲームで遊ぶ
+      url: https://typing.hryoichi.com/
+  screenshot:
+    file: typing-game.png
+    alt: Typing Game v2のタイトル画面。グラデーションのパネルにゲーム名とPLAYボタンを表示。
+    caption: 公開中のタイトル画面
 
 # 今後の追加用サンプル。使うブロックの行頭の「# 」を外し、実際の作品に合わせて編集してください。
 # - id: sample-reading-log
