@@ -30,7 +30,7 @@ function initMeters(reduced: boolean) {
   needle.removeAttribute("transform");
   gsap.set(needle, { rotation: start, svgOrigin: origin });
   if (ring) gsap.set(ring, { attr: { "stroke-dashoffset": Number(ring.dataset.len) } });
-  gsap.set(bars, { scaleX: 0 });
+  if (bars.length > 0) gsap.set(bars, { scaleX: 0 });
   counters.forEach((el) => (el.textContent = "0"));
 
   ScrollTrigger.create({
@@ -54,7 +54,7 @@ function initMeters(reduced: boolean) {
     },
   });
 
-  ScrollTrigger.batch(bars, {
+  if (bars.length > 0) ScrollTrigger.batch(bars, {
     start: "top 90%",
     once: true,
     onEnter: (els) => gsap.to(els, { scaleX: 1, duration: 1.2, ease: "power3.out", stagger: 0.1 }),

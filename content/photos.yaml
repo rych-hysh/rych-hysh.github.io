@@ -1,22 +1,28 @@
 # 写真
-# 1. 画像を content/photos/ に入れる（jpg / png / webp / avif、スマホの写真そのままで OK）
-# 2. ここに file・タイトル・場所を書く（書かなくても表示され、ファイル名がタイトルになります）
-# 並び順はこのリストの順。リストにない写真は最後に追加されます。
-- file: sample-1.jpg
-  title: Morning Haze
-  place: Kyoto
-- file: sample-2.jpg
-  title: Blue Hour
-  place: Reykjavík
-- file: sample-3.jpg
-  title: Coastline
-  place: Okinawa
-- file: sample-4.jpg
-  title: Neon Street
-  place: Taipei
-- file: sample-5.jpg
-  title: Glacier
-  place: Patagonia
-- file: sample-6.jpg
-  title: Old Town
-  place: Lisbon
+# 本人が撮影し、掲載することを確認した写真だけを追加してください。
+# 1. 画像を content/photos/ に入れる（jpg / png / webp / avif。HEIC は変換が必要）
+# 2. ここに file と alt（画像の内容を伝える代替テキスト）を書く。
+# タイトル・場所は画面に表示しません。撮影場所を推測して追加しないでください。
+# 並び順はこのリストの順。リストにない写真も自動掲載されるので、下書きの画像は置かないでください。
+# 一覧・フォルダが両方空の場合、写真欄は表示しません。
+# 掲載順は本人指定の順。原本は変更せず、サイト用の WebP コピーを使用。
+- file: img-9022.webp
+  alt: 逆光に照らされた秋の木々
+- file: img-8067.webp
+  alt: 暗い雲と夕日が差す港の建物
+- file: img-6214.webp
+  alt: 暗がりに並ぶあたたかな灯り
+- file: img-9020.webp
+  alt: 横に大きく伸びた木の幹と枝
+- file: img-8561.webp
+  alt: 日差しの中に並ぶ公園のブランコ
+- file: img-0676.webp
+  alt: 斜めの日差しが差し込む赤い車
+- file: img-1293.webp
+  alt: 夕空の下に広がる街並み
+- file: photo-a.webp
+  alt: 白いスモークを引きながら広がる5機の飛行機
+- file: photo-b.webp
+  alt: 青空を背景に編隊飛行する4機の飛行機
+- file: photo-c.webp
+  alt: 白いスモークを引いて正面から飛ぶ6機の飛行機
