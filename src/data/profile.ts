@@ -10,6 +10,7 @@ import skillsRaw from "../../content/skills.yaml?raw";
 import photosRaw from "../../content/photos.yaml?raw";
 import travelRaw from "../../content/travel.yaml?raw";
 import bikeRaw from "../../content/bike.yaml?raw";
+import projectsRaw from "../../content/projects.yaml?raw";
 
 /** YAML を読み込んでスキーマで検証。間違いがあればファイル名と場所つきでビルドを止める */
 function load<T extends z.ZodType>(file: string, raw: string, schema: T): z.infer<T> {
@@ -92,6 +93,41 @@ export const trips = load(
   ),
 );
 export type Trip = (typeof trips)[number];
+
+// ---------------------------------------------------------------- projects
+const nonEmpty = z.string().trim().min(1);
+const projectSchema = z.object({
+  id: nonEmpty.regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "半角英数字とハイフンで指定してください"),
+  published: z.boolean().default(false),
+  sample: z.boolean().default(false),
+  name: nonEmpty,
+  summary: nonEmpty,
+  role: nonEmpty,
+  features: z.array(nonEmpty).min(1),
+  status: nonEmpty.optional(),
+  stack: z.array(nonEmpty).default([]),
+  links: z.array(z.object({
+    label: nonEmpty,
+    url: z.url().refine((url) => /^https?:\/\//i.test(url), "http(s) の URL を指定してください"),
+  })).default([]),
+  screenshot: z.object({
+    file: nonEmpty.regex(/^[^/\\]+\.(png|jpe?g|webp|avif)$/i, "画像のファイル名を指定してください"),
+    alt: nonEmpty,
+    caption: nonEmpty.optional(),
+  }).optional(),
+});
+
+const projectData = load("projects.yaml", projectsRaw, z.array(projectSchema).superRefine((items, ctx) => {
+  const ids = new Set<string>();
+  items.forEach((item, index) => {
+    if (ids.has(item.id)) ctx.addIssue({ code: "custom", path: [index, "id"], message: "id が重複しています" });
+    ids.add(item.id);
+  });
+}));
+
+// 表示対象を先に絞る。未承認の作品をコンポーネントへ渡さない。
+export const projects = projectData.filter((project) => project.published);
+export type Project = (typeof projects)[number];
 
 // ---------------------------------------------------------------- bike
 export const bike = load(
