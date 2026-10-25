@@ -79,18 +79,52 @@ export const { groups: skills, certifications } = load(
   }),
 );
 
-export const trips = load(
+// ---------------------------------------------------------------- travel
+const travelImages = import.meta.glob<{ default: ImageMetadata }>(
+  "../../content/travel/*.{jpg,jpeg,JPG,JPEG,png,PNG,webp,WEBP,avif,AVIF}",
+  { eager: true },
+);
+const travelByName = new Map(
+  Object.entries(travelImages).map(([path, mod]) => [path.split("/").pop()!, mod.default]),
+);
+
+const travelData = load(
   "travel.yaml",
   travelRaw,
   z.array(
     z.object({
+      id: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "id は半角英数字とハイフンで指定してください").optional(),
       place: z.string(),
       region: z.string().default(""),
       lat: z.number().min(-90).max(90),
       lng: z.number().min(-180).max(180),
+      description: z.string().default(""),
+      photos: z.array(z.object({
+        file: z.string().min(1).regex(/^[^/\\]+$/, "content/travel/ 内のファイル名を指定してください"),
+        alt: z.string().trim().min(1, "写真の内容を表す alt を入力してください"),
+        caption: z.string().default(""),
+      })).default([]),
     }),
   ),
 );
+const travelIds = new Set<string>();
+export const trips = travelData.map((trip, index) => {
+  // id のない従来の4項目だけのデータも読み込める。新規登録では固定 id を推奨。
+  const id = trip.id ?? `place-${index + 1}`;
+  if (travelIds.has(id)) throw new Error(`content/travel.yaml の id "${id}" が重複しています`);
+  travelIds.add(id);
+  return {
+    ...trip,
+    id,
+    photos: trip.photos.map((photo) => {
+      const image = travelByName.get(photo.file);
+      if (!image) {
+        throw new Error(`content/travel.yaml の ${trip.place} の写真 "${photo.file}" が content/travel/ に見つかりません（大文字小文字も確認してください）`);
+      }
+      return { ...photo, image };
+    }),
+  };
+});
 export type Trip = (typeof trips)[number];
 
 // ---------------------------------------------------------------- bike
