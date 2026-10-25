@@ -1,0 +1,79 @@
+# Tottoki と Typing Game v2 は本人のプロダクト。sample: true の作品は架空の記入例です。
+# 実際の作品への差し替え方・画像の置き方は docs/projects.md を参照。
+# published: true の作品だけ表示します（省略時は false）。
+# 非公開情報や未承認の画像は、このリポジトリに保存しないでください。
+- id: tottoki
+  published: true
+  sample: false
+  name: Tottoki（とっとき）
+  summary: |-
+    InstagramやGoogleマップで見つけた「いつか行きたい場所」を、ひとつにまとめて保存するiPhoneアプリ。
+    地図やカレンダーで見返し、保存した場所を旅行の行程につなげます。
+  role: 個人開発
+  status: iPhoneアプリ
+  features:
+    - 共有メニューから、アプリを開かずに場所やイベントを保存
+    - 保存した場所は地図で、イベントの開催日はカレンダーで確認
+    - 保存した場所から日ごとの旅行の行程を作成し、友だちと共有
+  links:
+    - label: Tottokiの公式サイトを見る
+      url: https://tottoki.hryoichi.com/
+  screenshot:
+    file: tottoki-og.png
+    alt: Tottokiの公式紹介画像。「行きたいを、とっとく。」というメッセージとアプリアイコン。
+    caption: Tottoki — 行きたいを、とっとく。
+
+- id: typing-game
+  published: true
+  sample: false
+  name: Typing Game v2
+  summary: |-
+    学習用に制作した、最初期の個人プロダクト。
+    フレームワークを使わず、HTML5・CSS3・JavaScriptのみで実装した、PC専用のタイピングゲームです。
+  role: 個人開発
+  status: Webゲーム / PCのみ対応
+  features:
+    - Enterキーでプレイを開始し、Escキーでタイトル画面へ戻るシンプルな操作
+    - 平均KPM（1分間のキー入力回数）と正確率からスコアを計算
+    - プレイ後にランク・入力速度・正確率を結果画面で確認
+  stack: [HTML5, CSS3, JavaScript]
+  links:
+    - label: タイピングゲームで遊ぶ
+      url: https://typing.hryoichi.com/
+  screenshot:
+    file: typing-game.png
+    alt: Typing Game v2のタイトル画面。グラデーションのパネルにゲーム名とPLAYボタンを表示。
+    caption: 公開中のタイトル画面
+
+# 今後の追加用サンプル。使うブロックの行頭の「# 」を外し、実際の作品に合わせて編集してください。
+# - id: sample-reading-log
+#   published: true
+#   sample: true
+#   name: Reading Log
+#   summary: |-
+#     読んだ本と、そのとき考えたことを残す読書メモアプリ。
+#     読み終えたあとも、自分の言葉から一冊を振り返れることを目指します。
+#   role: 企画・画面設計・アプリ実装（担当範囲の記入例）
+#   features:
+#     - 読みたい・読書中・読了の3つの状態で本を整理
+#     - 本ごとに感想や気になった言葉を記録
+#     - タイトルやメモから読み返したい一冊を検索
+#   stack: [TypeScript, React Native]
+#   screenshot:
+#     file: sample-reading-log.png
+#     alt: 架空の読書メモアプリの画面例。読書中と読みたい本を一覧するレイアウト。
+#     caption: 紹介レイアウト用に作成した架空のUIです。
+
+# - id: sample-focus-timer
+#   published: true
+#   sample: true
+#   name: Focus Timer
+#   summary: |-
+#     作業と休憩のリズムをつくる、シンプルな集中タイマー。
+#     やることを一つ決めて、すぐに作業を始められる画面を考えています。
+#   role: 企画・UIデザイン・フロントエンド実装（担当範囲の記入例）
+#   features:
+#     - 作業時間と休憩時間を自分のペースに合わせて設定
+#     - 取り組むタスクをタイマーと一緒に表示
+#     - その日の作業セッションを一覧で振り返り
+#   stack: [TypeScript, React]

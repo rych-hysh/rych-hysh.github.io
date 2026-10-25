@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="1040" viewBox="0 0 720 1040">
+  <rect width="720" height="1040" rx="32" fill="#f7f8fc"/>
+  <rect x="36" y="32" width="148" height="36" rx="18" fill="#e7e5ff"/>
+  <g font-family="Arial, sans-serif">
+    <text x="110" y="56" text-anchor="middle" font-size="17" font-weight="700" fill="#6552b6">SAMPLE UI</text>
+    <circle cx="656" cy="50" r="19" fill="#dce8f9"/>
+    <text x="36" y="139" font-size="44" font-weight="700" fill="#172a43">Reading Log</text>
+    <text x="36" y="180" font-size="22" fill="#617187">A little space for your next chapter.</text>
+    <rect x="36" y="216" width="648" height="68" rx="16" fill="#fff" stroke="#dce2ec"/>
+    <circle cx="70" cy="248" r="9" fill="none" stroke="#8291a5" stroke-width="3"/>
+    <path d="M77 255l8 8" stroke="#8291a5" stroke-width="3"/>
+    <text x="105" y="258" font-size="21" fill="#738197">Search books and notes</text>
+    <rect x="36" y="317" width="196" height="52" rx="26" fill="#6655cf"/>
+    <text x="134" y="350" text-anchor="middle" font-size="19" font-weight="700" fill="#fff">Reading</text>
+    <text x="342" y="350" text-anchor="middle" font-size="19" fill="#617187">Want to read</text>
+    <text x="574" y="350" text-anchor="middle" font-size="19" fill="#617187">Finished</text>
+    <text x="36" y="435" font-size="25" font-weight="700" fill="#172a43">On your shelf</text>
+    <text x="684" y="433" text-anchor="end" font-size="18" fill="#738197">2 books</text>
+    <rect x="36" y="465" width="648" height="202" rx="20" fill="#fff" stroke="#e1e6ee"/>
+    <rect x="58" y="487" width="110" height="158" rx="8" fill="#bbd5de"/>
+    <path d="M68 610c25-70 52-70 90-100v115H68z" fill="#4d8091"/>
+    <path d="M68 628c36-32 65-20 90-42v49H68z" fill="#e8f1ee"/>
+    <text x="194" y="526" font-size="25" font-weight="700" fill="#172a43">Book title A</text>
+    <text x="194" y="563" font-size="19" fill="#738197">A note to come back to.</text>
+    <rect x="194" y="592" width="178" height="32" rx="16" fill="#edf2f8"/>
+    <text x="283" y="614" text-anchor="middle" font-size="16" fill="#4d627b">Reading / 1 note</text>
+    <rect x="36" y="689" width="648" height="202" rx="20" fill="#fff" stroke="#e1e6ee"/>
+    <rect x="58" y="711" width="110" height="158" rx="8" fill="#e6c5ac"/>
+    <circle cx="113" cy="764" r="27" fill="#f9ebd2"/>
+    <path d="M68 850l42-57 48 57z" fill="#a47364"/>
+    <text x="194" y="750" font-size="25" font-weight="700" fill="#172a43">Book title B</text>
+    <text x="194" y="787" font-size="19" fill="#738197">Room for a new perspective.</text>
+    <rect x="194" y="816" width="178" height="32" rx="16" fill="#edf2f8"/>
+    <text x="283" y="838" text-anchor="middle" font-size="16" fill="#4d627b">Reading / 3 notes</text>
+    <rect x="36" y="923" width="648" height="64" rx="16" fill="#6655cf"/>
+    <text x="360" y="964" text-anchor="middle" font-size="22" font-weight="700" fill="#fff">+ Add a book</text>
+    <text x="360" y="1022" text-anchor="middle" font-size="16" fill="#738197">Fictional sample for portfolio layout</text>
+  </g>
+</svg>

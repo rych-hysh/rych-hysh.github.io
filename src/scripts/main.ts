@@ -190,22 +190,6 @@ if (!reduced) {
       ),
   });
 
-  // ---------------------------------------------------------------- intro text (scroll highlight)
-  $$("[data-words]").forEach((el) => {
-    const chars = splitChars(el, "w");
-    chars.forEach((c) => (c.style.display = "inline"));
-    gsap.fromTo(
-      chars,
-      { opacity: 0.15 },
-      {
-        opacity: 1,
-        stagger: 0.02,
-        ease: "none",
-        scrollTrigger: { trigger: el, start: "top 80%", end: "bottom 45%", scrub: true },
-      },
-    );
-  });
-
   // ---------------------------------------------------------------- timeline line
   if ($(".timeline")) {
     gsap.to(".timeline-fill", {
