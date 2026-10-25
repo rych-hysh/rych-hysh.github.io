@@ -1,0 +1,119 @@
+---
+import { Image } from "astro:assets";
+import Base from "../layouts/Base.astro";
+import Nav from "../components/Nav.astro";
+import PhotoLightbox from "../components/PhotoLightbox.astro";
+import { photos, profile } from "../data/profile";
+---
+
+<Base title={`Photography — ${profile.name}`} description={`${profile.name} の写真ギャラリー`}>
+  <Nav />
+  <main>
+    <section class="section photos-page">
+      <div class="container">
+        <a href="/#hobbies" class="back mono">← トップへ戻る</a>
+        <div class="section-head">
+          <span class="section-index">03 /</span>
+          <h1 class="section-title">Photo <span class="grad">Gallery</span></h1>
+        </div>
+        <p class="summary mono">{photos.length} photos</p>
+        <div class="photos-grid">
+          {photos.map((photo, index) => (
+            <figure data-reveal>
+              <a href={photo.image.src} data-photo-open data-photo-alt={photo.alt} aria-label={`${photo.alt}を拡大`}>
+                <Image
+                  src={photo.image}
+                  alt={photo.alt}
+                  widths={[480, 800, 1200, 1680]}
+                  sizes="(max-width: 760px) 90vw, 50vw"
+                  loading={index < 2 ? "eager" : "lazy"}
+                />
+              </a>
+            </figure>
+          ))}
+        </div>
+      </div>
+    </section>
+  </main>
+  <PhotoLightbox />
+  <footer class="container footer mono">
+    <span>© {new Date().getFullYear()} {profile.name}</span>
+    <a href="/#hobbies">トップへ戻る ↑</a>
+  </footer>
+</Base>
+
+<script>
+  import "../scripts/main";
+</script>
+
+<style>
+  .photos-page {
+    --accent: var(--coral);
+    --accent-2: var(--pink);
+    padding-top: clamp(120px, 14vw, 160px);
+  }
+
+  .back {
+    display: inline-block;
+    margin-bottom: 32px;
+    font-size: 0.85rem;
+    color: var(--ink-2);
+  }
+
+  .back:hover,
+  .footer a:hover {
+    color: var(--coral);
+  }
+
+  .summary {
+    margin: -16px 0 40px;
+    font-size: 0.9rem;
+    color: var(--ink-3);
+  }
+
+  .photos-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+    gap: clamp(20px, 3vw, 40px);
+  }
+
+  figure {
+    margin: 0;
+    overflow: hidden;
+    border-radius: var(--radius);
+    background: var(--bg-2);
+  }
+
+  figure a {
+    display: block;
+    cursor: zoom-in;
+  }
+
+  figure a:focus-visible {
+    outline: 2px solid var(--blue);
+    outline-offset: -3px;
+  }
+
+  figure img {
+    width: 100%;
+    height: auto;
+  }
+
+  .footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding-top: 24px;
+    padding-bottom: 32px;
+    border-top: 1px solid var(--line);
+    color: var(--ink-3);
+    font-size: 0.8rem;
+  }
+
+  @media (max-width: 760px) {
+    .photos-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

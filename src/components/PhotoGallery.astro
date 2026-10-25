@@ -1,0 +1,146 @@
+---
+import { Image } from "astro:assets";
+import { photos } from "../data/profile";
+import { colorAt } from "../data/palette";
+---
+
+{
+  photos.length > 0 && (
+    <div class="photo-gallery" data-photo-gallery>
+      <div class="container gallery-head">
+        <p class="lead mono">// photography — 撮った写真</p>
+        <a class="all-photos" href="/photos/">写真をすべて見る <span aria-hidden="true">↗</span></a>
+      </div>
+
+      <div class="gallery" id="photo-preview" data-gallery-viewport data-lenis-prevent role="region" aria-label="写真ギャラリー" tabindex="0">
+        <div class="gallery-track" data-gallery-track>
+          {[false, true].map((copy) => (
+            <div class="gallery-group" data-gallery-group aria-hidden={copy ? "true" : undefined}>
+              {photos.map((p, i) => (
+                <figure class="photo" style={`--c: ${colorAt(i)}; --photo-ratio: ${p.image.width / p.image.height}`}>
+                  <a href={p.image.src} data-photo-open data-photo-alt={p.alt} tabindex={copy ? -1 : undefined} aria-label={copy ? undefined : `${p.alt}を拡大`} draggable="false">
+                    <Image
+                      src={p.image}
+                      alt={copy ? "" : p.alt}
+                      widths={[480, 800, 1200]}
+                      sizes="(max-width: 760px) 340px, 640px"
+                      loading="lazy"
+                      draggable="false"
+                    />
+                  </a>
+                </figure>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+<style>
+  .gallery-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px 24px;
+    margin-bottom: 24px;
+  }
+
+  .lead {
+    margin: 0;
+    color: var(--ink-3);
+    font-size: 0.95rem;
+  }
+
+  .all-photos {
+    font-size: 0.85rem;
+    color: var(--ink-2);
+  }
+
+  .all-photos:hover {
+    color: var(--ink);
+  }
+
+  a:focus-visible {
+    outline: 2px solid var(--blue);
+    outline-offset: -3px;
+  }
+
+  .all-photos span {
+    margin-left: 8px;
+    color: var(--coral);
+  }
+
+  .gallery {
+    --photo-height: clamp(180px, 25vw, 340px);
+    --photo-gap: clamp(16px, 2.5vw, 32px);
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0 var(--gutter) 36px;
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+    touch-action: pan-x pan-y;
+    user-select: none;
+    cursor: grab;
+  }
+
+  .gallery::-webkit-scrollbar {
+    display: none;
+  }
+
+  .gallery:focus-visible {
+    outline: 2px solid var(--blue);
+    outline-offset: -2px;
+  }
+
+  .gallery-track,
+  .gallery-group {
+    display: flex;
+    gap: var(--photo-gap);
+    width: max-content;
+  }
+
+  .gallery-group {
+    flex-shrink: 0;
+  }
+
+  .gallery-group[aria-hidden="true"] {
+    display: none;
+  }
+
+  [data-loop="true"] .gallery-group[aria-hidden="true"] {
+    display: flex;
+  }
+
+  .photo {
+    flex: 0 0 auto;
+    width: calc(var(--photo-height) * var(--photo-ratio));
+    height: var(--photo-height);
+    margin: 0;
+    overflow: hidden;
+    border-radius: var(--radius);
+    background: var(--bg-2);
+    box-shadow: 0 24px 48px -34px var(--c);
+  }
+
+  .photo a {
+    display: block;
+    height: 100%;
+    cursor: zoom-in;
+    -webkit-user-drag: none;
+  }
+
+  [data-dragging="true"],
+  [data-dragging="true"] a {
+    cursor: grabbing;
+  }
+
+  .photo img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+</style>
