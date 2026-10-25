@@ -1,4 +1,4 @@
-# Tottoki と Typing Game v2 は本人のプロダクト。sample: true の作品は架空の記入例です。
+# Tottoki・みんなでウミガメ・Typing Game v2は本人のプロダクト。sample: true の作品は架空の記入例です。
 # 実際の作品への差し替え方・画像の置き方は docs/projects.md を参照。
 # published: true の作品だけ表示します（省略時は false）。
 # 非公開情報や未承認の画像は、このリポジトリに保存しないでください。
@@ -22,6 +22,27 @@
     file: tottoki-og.png
     alt: Tottokiの公式紹介画像。「行きたいを、とっとく。」というメッセージとアプリアイコン。
     caption: Tottoki — 行きたいを、とっとく。
+
+- id: umigame
+  published: true
+  sample: false
+  name: みんなでウミガメ
+  summary: |-
+    AIがゲームマスターを務める「ウミガメのスープ」のiPhone向けアプリ（公開前）。
+    「はい・いいえ」で答えられる質問を重ね、ふしぎな話の真相を推理。ひとりでも、友だちと一緒でも楽しめます。
+  role: 個人開発
+  status: iPhone向けアプリ / 公開前
+  features:
+    - AIが出題・質問への回答・真相の判定を担当
+    - ひとりでじっくり推理し、途中でやめても続きから再開
+    - 5桁の部屋コードで集まり、質問や回答を共有しながらみんなで推理
+  links:
+    - label: みんなでウミガメの紹介サイトを見る
+      url: https://umigame.hryoichi.com/
+  screenshot:
+    file: umigame-icon.png
+    alt: みんなでウミガメの公式アプリアイコン。青い海の中を泳ぐウミガメのシルエット。
+    caption: みんなでウミガメ
 
 - id: typing-game
   published: true
