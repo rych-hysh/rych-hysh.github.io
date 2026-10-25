@@ -18,7 +18,7 @@ npm run build   # dist/ に出力
 | `content/career.yaml` | 経歴 |
 | `content/skills.yaml` | スキル・資格 |
 | `content/projects.yaml`, `content/projects/` | 個人開発の紹介（[編集手順](projects.md)） |
-| `content/travel.yaml` | 旅行先（緯度・経度） |
+| `content/travel.yaml`, `content/travel/` | 旅行先・写真・説明（[登録方法](travel-photos.md)） |
 | `content/photos.yaml`, `content/photos/` | 写真 |
 | `content/bike.yaml`, `content/bike/` | バイク |
 

@@ -1,7 +1,7 @@
 ---
-import { Image } from "astro:assets";
 import { photos } from "../data/profile";
-import { colorAt } from "../data/palette";
+import PhotoGallery from "./PhotoGallery.astro";
+import PhotoLightbox from "./PhotoLightbox.astro";
 import Riding from "./Riding.astro";
 import Travel from "./Travel.astro";
 ---
@@ -12,36 +12,11 @@ import Travel from "./Travel.astro";
       <span class="section-index">03 /</span>
       <h2 class="section-title">Hobbies <span class="grad">&amp; Travel</span></h2>
     </div>
-    <p class="lead mono">// photography — 撮った写真</p>
   </div>
 
-  <div class="gallery" data-gallery>
-    <div class="gallery-track" data-gallery-track>
-      {
-        photos.map((p, i) => (
-          <figure class="photo" style={`--c: ${colorAt(i)}`}>
-            <div class="photo-frame">
-              <Image
-                src={p.image}
-                alt={p.place ? `${p.title} — ${p.place}` : p.title}
-                widths={[480, 800, 1200]}
-                sizes="(max-width: 760px) 78vw, 38vw"
-                loading="lazy"
-                data-parallax
-              />
-            </div>
-            <figcaption>
-              <span class="mono idx">{String(i + 1).padStart(2, "0")}</span>
-              <span class="ph-title">{p.title}</span>
-              <span class="mono ph-place">{p.place}</span>
-            </figcaption>
-          </figure>
-        ))
-      }
-    </div>
-  </div>
+  <PhotoGallery />
 
-  <div class="container travel">
+  <div id="travel" class:list={["container travel", { "travel-with-photos": photos.length > 0 }]}>
     <p class="lead mono">// travel — 行った場所</p>
     <Travel limit={3} />
   </div>
@@ -49,6 +24,7 @@ import Travel from "./Travel.astro";
     <Riding />
   </div>
 </section>
+<PhotoLightbox />
 
 <style>
   .lead {
@@ -57,92 +33,12 @@ import Travel from "./Travel.astro";
     font-size: 0.95rem;
   }
 
-  /* ---------- gallery ---------- */
-  .gallery {
-    overflow: hidden;
-  }
-
-  .gallery-track {
-    display: flex;
-    gap: clamp(16px, 2.5vw, 32px);
-    width: max-content;
-    padding: 0 var(--gutter);
-  }
-
-  .photo {
-    flex-shrink: 0;
-    width: clamp(260px, 38vw, 520px);
-    margin: 0;
-  }
-
-  .photo:nth-child(even) {
-    margin-top: clamp(24px, 6vw, 80px);
-  }
-
-  .photo-frame {
-    aspect-ratio: 4 / 5;
-    overflow: hidden;
-    border-radius: var(--radius);
-    background: var(--bg-2);
-  }
-
-  .photo-frame img {
-    width: 100%;
-    height: 120%;
-    object-fit: cover;
-    transition: filter 0.4s;
-  }
-
-  .photo:hover img {
-    filter: saturate(1.2) brightness(1.05);
-  }
-
-  figcaption {
-    display: flex;
-    align-items: baseline;
-    gap: 12px;
-    padding-top: 14px;
-  }
-
-  .idx {
-    font-size: 0.75rem;
-    color: color-mix(in srgb, var(--c) 72%, var(--ink));
-  }
-
-  .photo-frame {
-    box-shadow: 0 30px 60px -35px var(--c);
-  }
-
-  .ph-title {
-    font-weight: 500;
-  }
-
-  .ph-place {
-    margin-left: auto;
-    font-size: 0.8rem;
-    color: var(--ink-3);
-  }
-
-  /* JS が無効 or 狭い画面では横スクロール */
-  @media (max-width: 760px) {
-    .gallery {
-      overflow-x: auto;
-      scroll-snap-type: x mandatory;
-      scrollbar-width: none;
-    }
-
-    .gallery::-webkit-scrollbar {
-      display: none;
-    }
-
-    .photo {
-      scroll-snap-align: center;
-      width: 78vw;
-    }
-  }
-
   /* ---------- travel ---------- */
   .travel {
+    scroll-margin-top: 140px;
+  }
+
+  .travel-with-photos {
     margin-top: clamp(96px, 12vw, 160px);
   }
 

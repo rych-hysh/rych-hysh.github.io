@@ -80,18 +80,52 @@ export const { groups: skills, certifications } = load(
   }),
 );
 
-export const trips = load(
+// ---------------------------------------------------------------- travel
+const travelImages = import.meta.glob<{ default: ImageMetadata }>(
+  "../../content/travel/*.{jpg,jpeg,JPG,JPEG,png,PNG,webp,WEBP,avif,AVIF}",
+  { eager: true },
+);
+const travelByName = new Map(
+  Object.entries(travelImages).map(([path, mod]) => [path.split("/").pop()!, mod.default]),
+);
+
+const travelData = load(
   "travel.yaml",
   travelRaw,
   z.array(
     z.object({
+      id: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "id は半角英数字とハイフンで指定してください").optional(),
       place: z.string(),
       region: z.string().default(""),
       lat: z.number().min(-90).max(90),
       lng: z.number().min(-180).max(180),
+      description: z.string().default(""),
+      photos: z.array(z.object({
+        file: z.string().min(1).regex(/^[^/\\]+$/, "content/travel/ 内のファイル名を指定してください"),
+        alt: z.string().trim().min(1, "写真の内容を表す alt を入力してください"),
+        caption: z.string().default(""),
+      })).default([]),
     }),
   ),
 );
+const travelIds = new Set<string>();
+export const trips = travelData.map((trip, index) => {
+  // id のない従来の4項目だけのデータも読み込める。新規登録では固定 id を推奨。
+  const id = trip.id ?? `place-${index + 1}`;
+  if (travelIds.has(id)) throw new Error(`content/travel.yaml の id "${id}" が重複しています`);
+  travelIds.add(id);
+  return {
+    ...trip,
+    id,
+    photos: trip.photos.map((photo) => {
+      const image = travelByName.get(photo.file);
+      if (!image) {
+        throw new Error(`content/travel.yaml の ${trip.place} の写真 "${photo.file}" が content/travel/ に見つかりません（大文字小文字も確認してください）`);
+      }
+      return { ...photo, image };
+    }),
+  };
+});
 export type Trip = (typeof trips)[number];
 
 // ---------------------------------------------------------------- projects
@@ -177,7 +211,7 @@ export const bikePhotos: { image: ImageMetadata; caption: string }[] = [
 const photoMeta = load(
   "photos.yaml",
   photosRaw,
-  z.array(z.object({ file: z.string(), title: z.string().optional(), place: text.optional() })),
+  z.array(z.object({ file: z.string(), title: z.string().optional(), place: text.optional(), alt: z.string().optional() })),
 );
 
 const images = import.meta.glob<{ default: ImageMetadata }>(
@@ -188,7 +222,7 @@ const byName = new Map(
   Object.entries(images).map(([path, mod]) => [path.split("/").pop()!, mod.default]),
 );
 
-export type Photo = { image: ImageMetadata; title: string; place: string };
+export type Photo = { image: ImageMetadata; title: string; place: string; alt: string };
 
 const listed = photoMeta.map((m): Photo => {
   const image = byName.get(m.file);
@@ -197,14 +231,15 @@ const listed = photoMeta.map((m): Photo => {
       `content/photos.yaml の "${m.file}" が content/photos/ に見つかりません（ファイル名・拡張子の大文字小文字を確認してください）`,
     );
   }
-  return { image, title: m.title ?? stem(m.file), place: m.place ?? "" };
+  const title = m.title ?? stem(m.file);
+  return { image, title, place: m.place ?? "", alt: m.alt ?? (m.place ? `${title} — ${m.place}` : title) };
 });
 
 const listedNames = new Set(photoMeta.map((m) => m.file));
 const unlisted = [...byName.entries()]
   .filter(([name]) => !listedNames.has(name))
   .sort(([a], [b]) => a.localeCompare(b))
-  .map(([name, image]): Photo => ({ image, title: stem(name), place: "" }));
+  .map(([name, image]): Photo => ({ image, title: stem(name), place: "", alt: stem(name) }));
 
 export const photos: Photo[] = [...listed, ...unlisted];
 

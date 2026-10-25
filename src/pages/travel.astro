@@ -20,6 +20,7 @@ const regions = new Set(trips.map((t) => t.region)).size;
         <p class="summary mono">
           <span>{trips.length}</span> places · <span>{regions}</span> regions
         </p>
+        <p class="page-intro">＋のある場所を選ぶと、その場所の写真と記録が開きます。</p>
         <Travel />
       </div>
     </section>
@@ -62,6 +63,13 @@ const regions = new Set(trips.map((t) => t.region)).size;
   .summary span {
     font-weight: 500;
     color: var(--ink);
+  }
+
+  .page-intro {
+    max-width: 44rem;
+    margin: -24px 0 40px;
+    font-size: 0.95rem;
+    color: var(--ink-2);
   }
 
   .footer {

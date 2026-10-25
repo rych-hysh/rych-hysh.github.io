@@ -11,12 +11,12 @@ const links = [
 
 <div class="progress" aria-hidden="true"><span></span></div>
 <header class="nav">
-  <a href="/#top" class="logo mono">
-    <span class="logo-mark"></span>{profile.name.split(" ")[0].toLowerCase()}<span class="blink">_</span>
+  <a href="/#top" class="logo mono" aria-label={`${profile.name} トップへ`}>
+    <span class="logo-mark" aria-hidden="true"></span>{profile.name.split(" ")[0].toLowerCase()}<span class="blink" aria-hidden="true">_</span>
   </a>
-  <nav aria-label="Main">
+  <nav aria-label="メインナビゲーション">
     <ul>
-      {links.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
+      {links.map((l) => <li><a href={l.href} aria-current={l.href === Astro.url.pathname ? "page" : undefined}>{l.label}</a></li>)}
     </ul>
   </nav>
 </header>
@@ -92,43 +92,74 @@ const links = [
   }
 
   nav a {
-    display: block;
-    padding: 6px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    min-width: 44px;
+    padding: 6px 12px;
     border-radius: 999px;
     font-size: 0.9rem;
     color: var(--ink-2);
+    white-space: nowrap;
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 6px;
+    -webkit-tap-highlight-color: transparent;
     transition:
-      background 0.25s,
-      color 0.25s;
+      text-decoration-color 0.2s,
+      color 0.2s;
   }
 
-  nav a:hover {
-    background: var(--ink);
-    color: #fff;
+  nav a[aria-current="page"],
+  nav a:active {
+    color: var(--ink);
+    text-decoration-color: currentColor;
+  }
+
+  @media (hover: hover) {
+    nav a:hover {
+      color: var(--ink);
+      text-decoration-color: currentColor;
+    }
+  }
+
+  a:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
   }
 
   @media (max-width: 640px) {
     .nav {
-      padding: 8px 8px 8px 16px;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 2px;
+      padding: 8px;
+      border-radius: 24px;
+    }
+
+    .logo {
+      align-self: flex-start;
+      min-height: 44px;
+      margin-left: 8px;
+      font-size: 0.85rem;
     }
 
     nav a {
-      padding: 6px 8px;
-      font-size: 0.8rem;
+      padding: 6px 2px;
+      font-size: 0.75rem;
     }
 
     ul {
       gap: 0;
+      justify-content: space-between;
     }
   }
 
-  @media (max-width: 420px) {
-    .logo {
-      font-size: 0;
-    }
-
-    .logo .blink {
-      display: none;
+  @media (prefers-reduced-motion: reduce) {
+    .blink {
+      animation: none;
     }
   }
 </style>

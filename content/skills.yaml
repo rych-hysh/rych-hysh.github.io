@@ -1,11 +1,11 @@
 # スキル（グループごとにカードになります）
 groups:
   - label: Languages
-    items: [TypeScript, Python, C/C++, Java, Fortran90, SQL]
+    items: [TypeScript, Python, C/C++, Java, Fortran90]
   - label: Frontend
-    items: [React, Next.js, React Native, Vue.js] 
+    items: [React, React Native, Next.js, Vue.js, evidence, Astro] 
   - label: Backend / Infra
-    items: [Node.js,  Docker, AWS, supabase]
+    items: [Node.js,  Docker, AWS, GCP, supabase]
   - label: Tools
     items: [Vim, Git, GitHub Actions, Figma, Linux]
 

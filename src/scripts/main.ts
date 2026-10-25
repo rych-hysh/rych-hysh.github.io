@@ -3,6 +3,8 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
 import { initHeroCanvas } from "./heroCanvas";
 import { initRiding } from "./riding";
+import { initPhotoGallery } from "./photoGallery";
+import { initPhotoLightbox, PHOTO_VIEWER_EVENT } from "./photoLightbox";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -37,16 +39,50 @@ if (!reduced) {
   gsap.ticker.lagSmoothing(0);
 }
 
+// 写真の切り替えによる高さの変化を反映してから、新しい旅行先へ移動する。
+window.addEventListener("travel:opened", (event) => {
+  const { entry, viewportTop } = (event as CustomEvent<{
+    entry: HTMLElement;
+    viewportTop?: number;
+  }>).detail;
+  const navBottom = document.querySelector("header.nav")?.getBoundingClientRect().bottom ?? 0;
+  const entryTop = window.scrollY + entry.getBoundingClientRect().top;
+  const top = Math.max(0, entryTop - navBottom - 16);
+  if (lenis) {
+    lenis.resize();
+    if (viewportTop !== undefined) {
+      // 閉じた写真の高さを相殺し、タップ時の見出し位置から動かす。
+      lenis.scrollTo(Math.max(0, entryTop - viewportTop), { immediate: true, force: true });
+    }
+    lenis.scrollTo(top, { duration: 0.8, force: true });
+  } else {
+    window.scrollTo({ top, behavior: "instant" });
+  }
+});
+
 // アンカーリンク（#xxx / 同じページの /#xxx）は Lenis 経由でスクロール
 $$<HTMLAnchorElement>('a[href^="#"], a[href^="/#"]').forEach((a) => {
   a.addEventListener("click", (e) => {
+    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
     const url = new URL(a.href);
-    if (url.pathname !== location.pathname) return; // 別ページなら普通に遷移
-    const target = url.hash ? $(url.hash) : null;
+    if (url.pathname !== location.pathname || url.search !== location.search) return; // 別ページなら普通に遷移
+    const target = url.hash ? $<HTMLElement>(url.hash) : null;
     if (!target) return;
     e.preventDefault();
-    if (lenis) lenis.scrollTo(target as HTMLElement, { offset: 0, duration: 1.4 });
-    else target.scrollIntoView();
+    if (location.hash !== url.hash) history.pushState(null, "", url.hash);
+    const focusTarget = () => {
+      if (!target.hasAttribute("tabindex")) {
+        target.setAttribute("tabindex", "-1");
+        target.addEventListener("blur", () => target.removeAttribute("tabindex"), { once: true });
+      }
+      target.focus({ preventScroll: true });
+    };
+    // Lenis とブラウザーの両方が CSS の scroll-margin-top を参照する。
+    if (lenis) lenis.scrollTo(target, { duration: 1.4, onComplete: focusTarget });
+    else {
+      target.scrollIntoView();
+      focusTarget();
+    }
   });
 });
 
@@ -79,6 +115,7 @@ if (reduced) {
   // タイピング演出
   if (typing) {
     const full = typing.dataset.typing ?? "";
+    typing.textContent = "";
     const state = { n: 0 };
     tl.to(
       state,
@@ -186,57 +223,6 @@ if (!reduced) {
     });
   });
 
-  // ---------------------------------------------------------------- gallery (横スクロール)
-  const gallery = $("[data-gallery]");
-  const mm = gsap.matchMedia();
-  if (gallery) mm.add("(min-width: 761px)", () => {
-    const gTrack = $("[data-gallery-track]")!;
-    const distance = () => gTrack.scrollWidth - window.innerWidth;
-
-    const tween = gsap.to(gTrack, {
-      x: () => -distance(),
-      ease: "none",
-      scrollTrigger: {
-        trigger: gallery,
-        start: "center center",
-        end: () => `+=${distance()}`,
-        pin: true,
-        scrub: 0.8,
-        invalidateOnRefresh: true,
-      },
-    });
-
-    // 写真の中の視差
-    $$("[data-parallax]", gallery).forEach((img) => {
-      gsap.fromTo(
-        img,
-        { yPercent: -8, scale: 1.1 },
-        {
-          yPercent: 8,
-          scale: 1,
-          ease: "none",
-          scrollTrigger: {
-            trigger: img.closest(".photo"),
-            containerAnimation: tween,
-            start: "left right",
-            end: "right left",
-            scrub: true,
-          },
-        },
-      );
-    });
-  });
-  if (gallery) mm.add("(max-width: 760px)", () => {
-    gsap.from(".photo", {
-      autoAlpha: 0,
-      x: 60,
-      stagger: 0.1,
-      duration: 1,
-      ease: "expo.out",
-      scrollTrigger: { trigger: "[data-gallery]", start: "top 85%" },
-    });
-  });
-
   // ---------------------------------------------------------------- magnetic buttons
   $$("[data-magnetic]").forEach((el) => {
     const xTo = gsap.quickTo(el, "x", { duration: 0.6, ease: "elastic.out(1, 0.4)" });
@@ -297,6 +283,14 @@ $$<HTMLButtonElement>("[data-copy]").forEach((btn) => {
     }
     setTimeout(() => (btn.textContent = label), 1600);
   });
+});
+
+// ---------------------------------------------------------------- independent photo gallery
+initPhotoLightbox();
+initPhotoGallery();
+document.addEventListener(PHOTO_VIEWER_EVENT, () => {
+  if (document.querySelector<HTMLDialogElement>("[data-photo-lightbox]")?.open) lenis?.stop();
+  else lenis?.start();
 });
 
 // ---------------------------------------------------------------- riding

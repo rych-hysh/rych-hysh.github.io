@@ -1,75 +1,165 @@
 # 旅行先（上から順に地球儀のアークでつながります。近い場所どうしを並べると線がきれい）
 # region は国名や地方名（地名と同じなら省略表示）。lat / lng は緯度・経度。Google マップで場所を右クリックするとコピーできます
 # 日本国内の場所にマウスを乗せると、地球儀が日本にズームインします
+# id は場所へのリンク用。変更しないでください。description / photos は省略できます。
+# 写真は content/travel/ に置き、file / alt / caption を登録（詳しくは docs/travel-photos.md）。
 
 # --- Japan
 - place: Tokyo
+  id: tokyo
   region: Japan
   lat: 35.68
   lng: 139.69
 - place: Kyoto
+  id: kyoto
   region: Japan
   lat: 35.01
   lng: 135.77
 - place: Yamaguchi
+  id: yamaguchi
   region: Japan
   lat: 34.18
   lng: 131.47
+  photos:
+    - file: yamaguchi-akiyoshido.jpg
+      alt: 木々に囲まれた秋芳洞の入口と、水辺に沿う屋根付きの歩道
+    - file: yamaguchi-akiyoshido2.jpg
+      alt: 照明に照らされた秋芳洞の岩壁と、川沿いに続く見学通路
+    - file: yamaguchi-akiyoshidai.jpg
+      alt: 秋吉台の草原に点在する白い岩と、丘陵を巡る遊歩道
 - place: Fukuoka
+  id: fukuoka
   region: Japan
   lat: 33.59
   lng: 130.40
 - place: Okinawa
+  id: okinawa
   region: Japan
   lat: 26.21
   lng: 127.68
 
 # --- Asia
+- place: Seoul
+  id: south-korea
+  region: South Korea
+  lat: 37.57
+  lng: 126.98
+  photos:
+    - file: korea.jpg
+      alt: 三つのアーチと瓦屋根がある門と、その前の広場を歩く人々
+    - file: korea2.jpg
+      alt: ガラス張りの天井の下に大きな曲線状の本棚が立つ図書館
+    - file: korea3.jpg
+      alt: 夜の川に向かって色鮮やかな噴水が伸びる橋と、川辺で眺める人々
+    - file: korea4.jpg
+      alt: 防音イヤーマフを着け、屋内射撃場で標的に向けて拳銃を構える人
 - place: Taipei
+  id: taipei
   region: Taiwan
   lat: 25.03
   lng: 121.56
+  photos:
+    - file: taipei-museum.jpg
+      alt: 緑の屋根と白い階段がある建物と、その前の広場を歩く人々
+    - file: taipei-101.jpg
+      alt: 青空の下、街路樹と周囲のビルの間から見上げた台北101
+- place: Ruifang
+  id: ruifang
+  region: Taiwan
+  lat: 25.11
+  lng: 121.81
+  photos:
+    - file: ruifang-lanterns.jpg
+      alt: 赤い提灯が並ぶ夜の路地と階段を歩く人々
 - place: Singapore
+  id: singapore
   region: Singapore
   lat: 1.29
   lng: 103.85
 
 # --- Europe
 - place: London
+  id: london
   region: UK
   lat: 51.51
   lng: -0.13
+  photos:
+    - file: london-img-0188.JPG
+      alt: 青空の下、塔のある建物と街灯が並ぶロンドンの通り
+    - file: london-img-0462.JPG
+      alt: アーチ状の屋根と吊り下げランプが続くロンドンのアーケード
+    - file: london-img-0927.JPG
+      alt: 青空の下、川沿いにそびえる観覧車と橋
+    - file: london-img-1107.JPG
+      alt: 高いアーチ窓と曲線状の書棚が並ぶ閲覧室の内部
 - place: Amsterdam
+  id: amsterdam
   region: Netherlands
   lat: 52.37
   lng: 4.90
+  photos:
+    - file: amsterdam-img-9826.JPG
+      alt: レンガ造りの建物と自転車が並び、路面電車の線路が延びるアムステルダムの通り
+    - file: amsterdam-img-9866.JPG
+      alt: アムステルダムの運河に架かる橋と、水面に映る建物や並木
+- place: Zaandam
+  id: zaandam
+  region: Netherlands
+  lat: 52.44
+  lng: 4.83
+  photos:
+    - file: zaandam.jpg
+      alt: 青空の下、水辺に並ぶ緑色の風車
 - place: Frankfurt
+  id: frankfurt
   region: Germany
   lat: 50.11
   lng: 8.68
 - place: Neuschwanstein Castle
+  id: neuschwanstein-castle
   region: Germany
   lat: 47.56
   lng: 10.75
 - place: Paris
+  id: paris
   region: France
   lat: 48.86
   lng: 2.35
+  photos:
+    - file: paris-img-1804.JPG
+      alt: 青空の下、ドーム屋根と時計、フランス国旗が見えるパリの建物
+    - file: paris-img-1894.JPG
+      alt: 石造りの建物の間に続くパリの通りと行き交う人や車
 - place: Versailles
+  id: versailles
   region: France
   lat: 48.80
   lng: 2.12
+  photos:
+    - file: versailles-img-9370.JPG
+      alt: 大きな鏡とシャンデリア、金色の燭台が並ぶベルサイユ宮殿の内部
 - place: Mont-Saint-Michel
+  id: mont-saint-michel
   region: France
   lat: 48.64
   lng: -1.51
+  photos:
+    - file: mont-saint-michel-img-1626.JPG
+      alt: 青空を背景にそびえるモンサンミシェルの修道院と麓の街並み
 
 # --- America
 - place: Hawaii
+  id: hawaii
   region: USA
   lat: 21.31
   lng: -157.86
 - place: Los Angeles
+  id: los-angeles
   region: USA
   lat: 34.05
   lng: -118.24
+- place: Las Vegas
+  id: las-vegas
+  region: USA
+  lat: 36.17
+  lng: -115.14
