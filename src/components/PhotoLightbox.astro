@@ -1,0 +1,67 @@
+<dialog class="photo-lightbox" data-photo-lightbox data-lenis-prevent aria-label="写真の拡大表示">
+  <button class="close" type="button" data-photo-close aria-label="拡大表示を閉じる" autofocus>×</button>
+  <img class="full-photo" data-photo-full alt="" />
+</dialog>
+
+<style>
+  .photo-lightbox {
+    width: min(1280px, calc(100vw - 32px));
+    max-width: none;
+    max-height: calc(100dvh - 32px);
+    padding: 60px 16px 16px;
+    overflow: auto;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: var(--radius);
+    background: #111b26;
+    color: #fff;
+    overscroll-behavior: contain;
+  }
+
+  .photo-lightbox::backdrop {
+    background: rgba(5, 13, 22, 0.88);
+    backdrop-filter: blur(8px);
+  }
+
+  .close {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-size: 28px;
+    cursor: pointer;
+  }
+
+  .close:focus-visible {
+    outline: 2px solid var(--cyan);
+    outline-offset: 3px;
+  }
+
+  .full-photo {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: calc(100dvh - 124px);
+    object-fit: contain;
+  }
+
+  @media (max-width: 760px) {
+    .photo-lightbox {
+      width: 100vw;
+      max-height: 100dvh;
+      padding: 60px 0 16px;
+      border: 0;
+      border-radius: 0;
+    }
+
+    .full-photo {
+      max-height: calc(100dvh - 96px);
+    }
+  }
+</style>

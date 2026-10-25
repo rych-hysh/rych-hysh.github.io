@@ -141,7 +141,7 @@ export const bikePhotos: { image: ImageMetadata; caption: string }[] = [
 const photoMeta = load(
   "photos.yaml",
   photosRaw,
-  z.array(z.object({ file: z.string(), title: z.string().optional(), place: text.optional() })),
+  z.array(z.object({ file: z.string(), title: z.string().optional(), place: text.optional(), alt: z.string().optional() })),
 );
 
 const images = import.meta.glob<{ default: ImageMetadata }>(
@@ -152,7 +152,7 @@ const byName = new Map(
   Object.entries(images).map(([path, mod]) => [path.split("/").pop()!, mod.default]),
 );
 
-export type Photo = { image: ImageMetadata; title: string; place: string };
+export type Photo = { image: ImageMetadata; title: string; place: string; alt: string };
 
 const listed = photoMeta.map((m): Photo => {
   const image = byName.get(m.file);
@@ -161,14 +161,15 @@ const listed = photoMeta.map((m): Photo => {
       `content/photos.yaml の "${m.file}" が content/photos/ に見つかりません（ファイル名・拡張子の大文字小文字を確認してください）`,
     );
   }
-  return { image, title: m.title ?? stem(m.file), place: m.place ?? "" };
+  const title = m.title ?? stem(m.file);
+  return { image, title, place: m.place ?? "", alt: m.alt ?? (m.place ? `${title} — ${m.place}` : title) };
 });
 
 const listedNames = new Set(photoMeta.map((m) => m.file));
 const unlisted = [...byName.entries()]
   .filter(([name]) => !listedNames.has(name))
   .sort(([a], [b]) => a.localeCompare(b))
-  .map(([name, image]): Photo => ({ image, title: stem(name), place: "" }));
+  .map(([name, image]): Photo => ({ image, title: stem(name), place: "", alt: stem(name) }));
 
 export const photos: Photo[] = [...listed, ...unlisted];
 

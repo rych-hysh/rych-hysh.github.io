@@ -3,6 +3,8 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
 import { initHeroCanvas } from "./heroCanvas";
 import { initRiding } from "./riding";
+import { initPhotoGallery } from "./photoGallery";
+import { initPhotoLightbox, PHOTO_VIEWER_EVENT } from "./photoLightbox";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -200,57 +202,6 @@ if (!reduced) {
     });
   });
 
-  // ---------------------------------------------------------------- gallery (横スクロール)
-  const gallery = $("[data-gallery]");
-  const mm = gsap.matchMedia();
-  if (gallery) mm.add("(min-width: 761px)", () => {
-    const gTrack = $("[data-gallery-track]")!;
-    const distance = () => gTrack.scrollWidth - window.innerWidth;
-
-    const tween = gsap.to(gTrack, {
-      x: () => -distance(),
-      ease: "none",
-      scrollTrigger: {
-        trigger: gallery,
-        start: "center center",
-        end: () => `+=${distance()}`,
-        pin: true,
-        scrub: 0.8,
-        invalidateOnRefresh: true,
-      },
-    });
-
-    // 写真の中の視差
-    $$("[data-parallax]", gallery).forEach((img) => {
-      gsap.fromTo(
-        img,
-        { yPercent: -8, scale: 1.1 },
-        {
-          yPercent: 8,
-          scale: 1,
-          ease: "none",
-          scrollTrigger: {
-            trigger: img.closest(".photo"),
-            containerAnimation: tween,
-            start: "left right",
-            end: "right left",
-            scrub: true,
-          },
-        },
-      );
-    });
-  });
-  if (gallery) mm.add("(max-width: 760px)", () => {
-    gsap.from(".photo", {
-      autoAlpha: 0,
-      x: 60,
-      stagger: 0.1,
-      duration: 1,
-      ease: "expo.out",
-      scrollTrigger: { trigger: "[data-gallery]", start: "top 85%" },
-    });
-  });
-
   // ---------------------------------------------------------------- magnetic buttons
   $$("[data-magnetic]").forEach((el) => {
     const xTo = gsap.quickTo(el, "x", { duration: 0.6, ease: "elastic.out(1, 0.4)" });
@@ -311,6 +262,14 @@ $$<HTMLButtonElement>("[data-copy]").forEach((btn) => {
     }
     setTimeout(() => (btn.textContent = label), 1600);
   });
+});
+
+// ---------------------------------------------------------------- independent photo gallery
+initPhotoLightbox();
+initPhotoGallery();
+document.addEventListener(PHOTO_VIEWER_EVENT, () => {
+  if (document.querySelector<HTMLDialogElement>("[data-photo-lightbox]")?.open) lenis?.stop();
+  else lenis?.start();
 });
 
 // ---------------------------------------------------------------- riding

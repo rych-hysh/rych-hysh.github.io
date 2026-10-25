@@ -1,4 +1,4 @@
-# バイク（お気に入りのルートはサンプルなので書き換えてください）
+# バイク（本人から提供された写真と愛車情報）
 
 # 愛車（複数 OK。上から順に表示）
 bikes:
@@ -6,29 +6,20 @@ bikes:
     maker: Kawasaki
     year: "2026"
     cc: 398
-    note: カラーはブラック。
+    note: 免許取得後初めて買ったバイク
 
 # 数字まわり
 stats:
   totalKm: 3091 # 総走行距離（メーターに表示）
 
 # バイクの写真
-# content/bike/ に画像を入れると表示されます（書かなくても OK。書くとキャプションと並び順を指定できる）
-photos: []
-#  - file: my-bike.jpg
-#    caption: 箱根にて
+# content/bike/ の画像はリスト未記入でも自動掲載されます。下書きの画像は置かないでください。
+# 本人の写真だけを追加し、書くとキャプションと並び順を指定できます。
+photos:
+  - file: eliminator-night.jpg
+    caption: 夜のELIMINATOR
+  - file: eliminator-lakeside.jpg
+    caption: 湖畔のELIMINATOR
 
-# お気に入りのルート（距離のバーで表示）
-routes:
-  - name: ビーナスライン
-    area: 長野
-    km: 76
-  - name: しまなみ海道
-    area: 広島〜愛媛
-    km: 70
-  - name: 磐梯吾妻スカイライン
-    area: 福島
-    km: 29
-  - name: 阿蘇パノラマライン
-    area: 熊本
-    km: 30
+# お気に入りルートは特にないため掲載しません（空なら欄を非表示）。
+routes: []

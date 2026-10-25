@@ -40,14 +40,15 @@ const maxRoute = Math.max(1, ...routes.map((r) => r.km));
       <div class="bike-photos">
         {bikePhotos.map((p, i) => (
           <figure class="bike-photo" data-reveal style={`--c: ${colorAt(i + 1)}`}>
-            <Image
-              src={p.image}
-              alt={p.caption || "バイクの写真"}
-              widths={[480, 800, 1200]}
-              sizes="(max-width: 760px) 100vw, 33vw"
-              loading="lazy"
-            />
-            {p.caption && <figcaption>{p.caption}</figcaption>}
+            <a href={p.image.src} data-photo-open data-photo-alt={p.caption || "バイクの写真"} aria-label={`${p.caption || "バイクの写真"}を拡大`}>
+              <Image
+                src={p.image}
+                alt={p.caption || "バイクの写真"}
+                widths={[480, 800, 1200]}
+                sizes="(max-width: 760px) 100vw, 50vw"
+                loading="lazy"
+              />
+            </a>
           </figure>
         ))}
       </div>
@@ -120,45 +121,56 @@ const maxRoute = Math.max(1, ...routes.map((r) => r.km));
     </div>
 
     <!-- ================================================= routes -->
-    <div>
-      <h3 class="sub mono">// favorite routes</h3>
-      <ol class="routes">
+    <div class="ride-details">
+      {
+        routes.length > 0 && (
+          <div>
+            <h3 class="sub mono">// favorite routes</h3>
+            <ol class="routes">
+              {routes.map((r, i) => (
+                <li class="route" data-reveal style={`--c: ${colorAt(i + 1)}`}>
+                  <div class="route-head">
+                    <span class="route-name">{r.name}</span>
+                    <span class="route-area">{r.area}</span>
+                    <span class="route-km mono">{r.km} km</span>
+                  </div>
+                  <div class="route-bar">
+                    <span data-route-bar style={`width: ${(r.km / maxRoute) * 100}%`} />
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </div>
+        )
+      }
+
+      <!-- ================================================= garage -->
+      <h3 class:list={["sub mono", { "garage-title": routes.length > 0 }]}>// garage</h3>
+      <ul class="bikes">
         {
-          routes.map((r, i) => (
-            <li class="route" data-reveal style={`--c: ${colorAt(i + 1)}`}>
-              <div class="route-head">
-                <span class="route-name">{r.name}</span>
-                <span class="route-area">{r.area}</span>
-                <span class="route-km mono">{r.km} km</span>
-              </div>
-              <div class="route-bar">
-                <span data-route-bar style={`width: ${(r.km / maxRoute) * 100}%`} />
-              </div>
+          bikes.map((b) => (
+            <li class="bike" data-reveal>
+              <p class="bike-maker">{b.maker}</p>
+              <h4 class="bike-name">{b.name}</h4>
+              <dl class="bike-specs">
+                  <div class="bike-spec">
+                    <dt>年式</dt>
+                    <dd class="mono">{b.year}</dd>
+                  </div>
+                  {b.cc && (
+                    <div class="bike-spec">
+                      <dt>排気量</dt>
+                      <dd class="mono">{b.cc} cc</dd>
+                    </div>
+                  )}
+              </dl>
+              {b.note && <p class="bike-note">{b.note}</p>}
             </li>
           ))
         }
-      </ol>
+      </ul>
     </div>
   </div>
-
-  <!-- ================================================= garage -->
-  <h3 class="sub mono garage-title">// garage</h3>
-  <ul class="bikes">
-    {
-      bikes.map((b, i) => (
-        <li class="bike card" data-reveal style={`--c: ${colorAt(i + 2)}`}>
-          <p class="bike-meta mono">
-            {b.year}
-            {b.cc && <> · {b.cc}cc</>}
-          </p>
-          <p class="bike-name">
-            <span class="bike-maker">{b.maker}</span> {b.name}
-          </p>
-          {b.note && <p class="bike-note">{b.note}</p>}
-        </li>
-      ))
-    }
-  </ul>
 
   <!-- ================================================= ブロックの下端を走る小さなバイク -->
   <div class="mini-road" aria-hidden="true">
@@ -167,48 +179,72 @@ const maxRoute = Math.max(1, ...routes.map((r) => r.km));
         <span class="mini-puffs"><i></i><i></i><i></i></span>
         <svg viewBox="0 0 400 240">
           <defs>
-            <!-- 愛車に合わせて黒いタンク -->
-            <linearGradient id="mini-tank" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0" stop-color="#4a5a78"></stop>
-              <stop offset="0.5" stop-color="#1a2438"></stop>
-              <stop offset="1" stop-color="#0b1b2b"></stop>
+            <linearGradient id="mini-tank" x1="0" y1="0" x2="0.4" y2="1">
+              <stop offset="0" stop-color="#59616a"></stop>
+              <stop offset="0.35" stop-color="#252a30"></stop>
+              <stop offset="1" stop-color="#10151b"></stop>
+            </linearGradient>
+            <linearGradient id="mini-metal" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stop-color="#626d78"></stop>
+              <stop offset="0.45" stop-color="#d4dbe1"></stop>
+              <stop offset="1" stop-color="#626d78"></stop>
             </linearGradient>
           </defs>
-          <!-- アメリカン（クルーザー）：長いホイールベース・寝かせたフォーク・低いシート -->
-          <g fill="none" stroke="#0b1b2b" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M29 170 A52 52 0 0 1 113 140"></path>
-            <path d="M295 145 A50 50 0 0 1 355 137"></path>
-            <path d="M80 180 L170 165"></path>
-            <path d="M120 128 L105 172" stroke="#8fa2c4" stroke-width="7"></path>
-            <path d="M150 122 L200 104 L272 88"></path>
-            <path d="M272 92 L238 170 L170 165"></path>
-            <path d="M272 84 L330 180" stroke="#8fa2c4" stroke-width="10"></path>
-            <path d="M266 78 L256 54 L234 58"></path>
-            <path d="M226 172 C200 196 130 198 62 194" stroke="#8fa2c4"></path>
-            <path d="M262 170 L282 170"></path>
+
+          <!-- 実車写真をもとに、低いシート・細長いタンク・短いフェンダーの輪郭にする。 -->
+          <g fill="none" stroke="#1b222b" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M82 177 L166 166 L141 126" stroke-width="10"></path>
+            <path d="M138 124 L180 112 L263 99 L243 172 L166 166 L138 124" stroke-width="7"></path>
+            <path d="M263 99 L327 177" stroke-width="11" stroke="url(#mini-metal)"></path>
+            <path d="M274 110 L327 177" stroke-width="5"></path>
+            <path d="M135 126 L111 173" stroke="url(#mini-metal)" stroke-width="10"></path>
+            <path d="M130 135 L119 135 M126 143 L115 143 M122 151 L111 151 M118 159 L107 159" stroke-width="4"></path>
+            <path d="M46 149 Q79 119 119 140" stroke-width="10"></path>
+            <path d="M298 146 Q326 128 351 149" stroke-width="8"></path>
           </g>
-          <!-- V ツイン風のエンジン -->
-          <g fill="#2a3650">
-            <rect x="180" y="138" width="58" height="34" rx="8"></rect>
-            <path d="M212 142 L236 112 L250 122 L228 150 Z"></path>
-            <path d="M196 142 L184 110 L200 104 L212 138 Z"></path>
-          </g>
-          <path d="M62 188 L38 192 L40 203 L64 200 Z" fill="#c4d0e0"></path>
-          <path d="M196 100 C204 84 252 80 270 90 L268 98 C246 104 214 108 198 110 Z" fill="url(#mini-tank)"></path>
-          <path d="M106 122 C124 112 158 114 182 116 L198 108 L201 114 L186 127 C160 129 132 129 108 131 Z" fill="#0b1b2b"></path>
-          <circle cx="292" cy="96" r="11" fill="#fff1c2" stroke="#0b1b2b" stroke-width="5"></circle>
+
+          <path d="M145 132 L175 125 L185 145 L169 161 Z" fill="#28313b" stroke="#141c25" stroke-width="3"></path>
+
+          <!-- 直立したエンジンと前側のラジエーター。 -->
+          <path d="M191 119 L229 115 L245 146 L236 173 L192 171 L181 149 Z" fill="#303740" stroke="#121820" stroke-width="5"></path>
+          <path d="M196 126 L225 122 L232 144 L200 148 Z" fill="#535b64"></path>
+          <path d="M199 130 L225 127 M201 137 L228 134" fill="none" stroke="#242b33" stroke-width="3"></path>
+          <circle cx="212" cy="157" r="15" fill="#1d252d" stroke="#77818b" stroke-width="3"></circle>
+          <path d="M253 116 L266 120 L274 148 L261 153 Z" fill="#252d35" stroke="#68727d" stroke-width="3"></path>
+          <path d="M258 126 L268 128 M261 135 L270 137 M263 144 L272 146" stroke="#8b949e" stroke-width="2"></path>
+
+          <!-- 低い黒いサイレンサーと2本のエキゾーストパイプ。 -->
+          <path d="M234 137 Q250 154 251 173 Q248 183 230 185 M243 134 Q260 157 260 175 Q256 192 230 192" fill="none" stroke="#8b949e" stroke-width="5"></path>
+          <path d="M124 179 L231 178 Q241 183 234 195 L120 198 Z" fill="#161d25" stroke="#4c5661" stroke-width="3"></path>
+          <path d="M120 180 L130 181 L127 197 L117 197 Z" fill="url(#mini-metal)"></path>
+
+          <!-- 段差の小さいシートと、上端が緩やかに伸びるタンク。 -->
+          <path d="M105 120 Q119 111 144 113 L172 117 L186 107 L194 115 L180 128 L137 126 L107 129 Z" fill="#111820" stroke="#4d5661" stroke-width="3"></path>
+          <path d="M177 101 L183 86 Q214 74 247 82 L264 96 L259 109 L223 118 L191 111 Z" fill="url(#mini-tank)" stroke="#151c23" stroke-width="3"></path>
+          <path d="M190 89 Q217 81 243 87" fill="none" stroke="#7d858d" stroke-width="2.5"></path>
+          <path d="M203 103 L237 99" stroke="#adb4ba" stroke-width="3" opacity="0.7"></path>
+          <path d="M263 85 L254 61 L277 57 M265 60 L276 37 M253 62 L239 41" fill="none" stroke="#252e38" stroke-width="6" stroke-linecap="round"></path>
+          <ellipse cx="279" cy="33" rx="10" ry="6" fill="#29333f" transform="rotate(-20 279 33)"></ellipse>
+          <ellipse cx="235" cy="37" rx="10" ry="6" fill="#29333f" transform="rotate(20 235 37)"></ellipse>
+          <circle cx="291" cy="103" r="13" fill="#e3edf1" stroke="#1c252f" stroke-width="6"></circle>
+          <path d="M271 104 H279" stroke="#252e38" stroke-width="6"></path>
+          <path d="M284 103 H298" stroke="#fff" stroke-width="3"></path>
+          <path d="M48 140 L40 146" stroke="#e46b71" stroke-width="6" stroke-linecap="round"></path>
+
+          <!-- 黒いキャストホイール。タイヤとブレーキは固定し、スポークだけを回す。 -->
           {
-            [80, 330].map((cx, i) => (
-              <g class="mini-wheel">
-                <circle cx={cx} cy="180" r="40" fill="none" stroke="#0b1b2b" stroke-width="15" />
-                <circle cx={cx} cy="180" r="25" fill="none" style={`stroke: var(${i ? "--pink" : "--cyan"})`} stroke-width="4" />
-                <path
-                  d={`M${cx - 25} 180 H${cx + 25} M${cx} 155 V205`}
-                  stroke="#8fa2c4"
-                  stroke-width="4"
-                />
-                <circle cx={cx} cy="180" r="6" fill="#0b1b2b" />
-              </g>
+            [{ cx: 82, r: 39 }, { cx: 327, r: 43 }].map(({ cx, r }) => (
+              <>
+                <circle cx={cx} cy="177" r={r} fill="none" stroke="#141c25" stroke-width="13" />
+                <circle cx={cx} cy="177" r={r - 8} fill="none" stroke="#65717d" stroke-width="3" />
+                <circle cx={cx} cy="177" r="19" fill="none" stroke="#a2adb6" stroke-width="4" />
+                <g class="mini-wheel" style={`--wheel-x: ${cx}px`}>
+                  {[0, 72, 144, 216, 288].map((angle) => (
+                    <path d={`M${cx} 177 L${cx + 10} 164 L${cx + r - 9} 166`} fill="none" stroke="#202a35" stroke-width="5" stroke-linecap="round" transform={`rotate(${angle} ${cx} 177)`} />
+                  ))}
+                </g>
+                <circle cx={cx} cy="177" r="6" fill="#344150" />
+              </>
             ))
           }
         </svg>
@@ -232,7 +268,7 @@ const maxRoute = Math.max(1, ...routes.map((r) => r.km));
   /* ---------- photos */
   .bike-photos {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
     gap: 14px;
     margin-bottom: 40px;
   }
@@ -246,6 +282,17 @@ const maxRoute = Math.max(1, ...routes.map((r) => r.km));
     background: var(--bg-2);
   }
 
+  .bike-photo a {
+    display: block;
+    height: 100%;
+    cursor: zoom-in;
+  }
+
+  .bike-photo a:focus-visible {
+    outline: 2px solid var(--blue);
+    outline-offset: -3px;
+  }
+
   .bike-photo img {
     width: 100%;
     height: 100%;
@@ -257,22 +304,11 @@ const maxRoute = Math.max(1, ...routes.map((r) => r.km));
     scale: 1.05;
   }
 
-  .bike-photo figcaption {
-    position: absolute;
-    left: 12px;
-    bottom: 12px;
-    padding: 3px 10px;
-    font-family: var(--font-jp);
-    font-size: 0.8rem;
-    color: #fff;
-    background: rgba(11, 27, 43, 0.6);
-    border-radius: 999px;
-  }
 
   /* ---------- meter + routes */
   .ride-grid {
     display: grid;
-    grid-template-columns: minmax(240px, 320px) 1fr;
+    grid-template-columns: minmax(240px, 320px) minmax(0, 1fr);
     gap: clamp(28px, 5vw, 64px);
     align-items: center;
   }
@@ -385,47 +421,78 @@ const maxRoute = Math.max(1, ...routes.map((r) => r.km));
   }
 
   .bike {
-    position: relative;
-    padding: 16px 18px 16px 22px;
-    overflow: hidden;
-  }
-
-  .bike::before {
-    content: "";
-    position: absolute;
-    inset: 0 auto 0 0;
-    width: 4px;
-    background: var(--c);
-  }
-
-  .bike-meta {
-    margin: 0;
-    font-size: 0.75rem;
-    color: color-mix(in srgb, var(--c) 72%, var(--ink));
-  }
-
-  .bike-name {
-    margin: 2px 0 0;
-    font-size: 1.15rem;
-    font-weight: 700;
+    container-type: inline-size;
+    min-width: 0;
+    padding: 26px 8px 20px;
+    border-top: 2px solid var(--ink);
   }
 
   .bike-maker {
-    font-weight: 500;
+    margin: 0 0 16px;
     color: var(--ink-2);
+    font-size: 0.875rem;
+    letter-spacing: 0.06em;
+  }
+
+  .bike-name {
+    margin: 0 0 24px;
+    font-size: clamp(1.6rem, 10cqi, 3rem);
+    line-height: 1;
+    font-weight: 700;
+    letter-spacing: -0.06em;
+    overflow-wrap: anywhere;
+  }
+
+  .bike-specs {
+    display: flex;
+    flex-wrap: wrap;
+    row-gap: 12px;
+    padding: 18px 0;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    margin: 0 0 20px;
+  }
+
+  .bike-spec {
+    position: relative;
+    padding-right: 26px;
+  }
+
+  .bike-spec + .bike-spec {
+    padding-left: 26px;
+    border-left: 1px solid var(--line);
+  }
+
+  .bike-spec dt {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .bike-spec dd {
+    margin: 0;
+    font-size: 0.875rem;
+    line-height: 1.5;
   }
 
   .bike-note {
-    margin: 4px 0 0;
+    margin: 0;
     font-family: var(--font-jp);
-    font-size: 0.88rem;
+    font-size: 0.8125rem;
+    line-height: 1.8;
     color: var(--ink-2);
   }
 
   /* ---------- 下端を走る小さなバイク（CSS アニメーションのみ・transform だけ） */
   .mini-road {
+    --mini-bike-width: 100px;
     position: relative;
-    height: 44px;
+    height: 64px;
     margin-top: 48px;
     overflow: hidden;
     border-bottom: 1px solid var(--line);
@@ -443,7 +510,7 @@ const maxRoute = Math.max(1, ...routes.map((r) => r.km));
     position: absolute;
     right: 100%;
     bottom: 1px;
-    width: 76px;
+    width: var(--mini-bike-width);
     aspect-ratio: 400 / 240;
     animation: mini-bob 0.36s ease-in-out infinite alternate;
   }
@@ -456,9 +523,9 @@ const maxRoute = Math.max(1, ...routes.map((r) => r.km));
   }
 
   .mini-wheel {
-    transform-box: fill-box;
-    transform-origin: center;
-    animation: mini-spin 0.45s linear infinite;
+    transform-box: view-box;
+    transform-origin: var(--wheel-x) 177px;
+    animation: mini-spin 0.65s linear infinite;
   }
 
   .mini-puffs i {
@@ -486,7 +553,7 @@ const maxRoute = Math.max(1, ...routes.map((r) => r.km));
       transform: translateX(0);
     }
     to {
-      transform: translateX(calc(100% + 76px));
+      transform: translateX(calc(100% + var(--mini-bike-width)));
     }
   }
 
@@ -537,4 +604,5 @@ const maxRoute = Math.max(1, ...routes.map((r) => r.km));
       justify-self: center;
     }
   }
+
 </style>
