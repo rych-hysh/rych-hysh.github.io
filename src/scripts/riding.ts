@@ -1,5 +1,5 @@
 // 趣味：バイクのメーターとルートのバーのアニメーション
-// （下端を走る小さなバイクは CSS アニメーションだけで動かしている）
+// （riding 見出し横の小さなバイクは CSS アニメーションだけで動かしている）
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 

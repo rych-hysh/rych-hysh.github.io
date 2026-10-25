@@ -1,6 +1,6 @@
 ---
-// 趣味：バイク。写真＋メーター＋ツーリング記録＋ガレージ。
-// モーショングラフィックは控えめに、ブロックの下端を小さなバイクが走り抜けるだけ。
+// 趣味：バイク。ガレージ＋メーター＋写真。
+// 小さなバイクは riding 見出しの横で控えめに動かす。
 import { Image } from "astro:assets";
 import { bike, bikePhotos } from "../data/profile";
 import { colorAt } from "../data/palette";
@@ -33,147 +33,9 @@ const maxRoute = Math.max(1, ...routes.map((r) => r.km));
 ---
 
 <div class="riding" data-anim-scope>
-  <p class="lead mono">// riding — バイク</p>
-
-  {
-    bikePhotos.length > 0 && (
-      <div class="bike-photos">
-        {bikePhotos.map((p, i) => (
-          <figure class="bike-photo" data-reveal style={`--c: ${colorAt(i + 1)}`}>
-            <a href={p.image.src} data-photo-open data-photo-alt={p.caption || "バイクの写真"} aria-label={`${p.caption || "バイクの写真"}を拡大`}>
-              <Image
-                src={p.image}
-                alt={p.caption || "バイクの写真"}
-                widths={[480, 800, 1200]}
-                sizes="(max-width: 760px) 100vw, 50vw"
-                loading="lazy"
-              />
-            </a>
-          </figure>
-        ))}
-      </div>
-    )
-  }
-
-  <div class="ride-grid">
-    <!-- ================================================= meter -->
-    <div class="gauge card" data-reveal>
-      <svg viewBox="0 0 220 200" aria-hidden="true">
-        <defs>
-          <linearGradient id="bk-gauge" x1="0" y1="1" x2="1" y2="0">
-            <stop offset="0" style="stop-color: var(--mint)"></stop>
-            <stop offset="0.5" style="stop-color: var(--cyan)"></stop>
-            <stop offset="1" style="stop-color: var(--pink)"></stop>
-          </linearGradient>
-        </defs>
-        <path d={arc} fill="none" style="stroke: var(--line)" stroke-width="10" stroke-linecap="round"></path>
-        <path
-          d={arc}
-          fill="none"
-          stroke="url(#bk-gauge)"
-          stroke-width="10"
-          stroke-linecap="round"
-          pathLength="1"
-          stroke-dasharray="1"
-          stroke-dashoffset={1 - ratio}
-          data-gauge-arc
-          data-ratio={ratio}></path>
-        {
-          ticks.map((t) => (
-            <>
-              <line
-                x1={t.x1}
-                y1={t.y1}
-                x2={t.x2}
-                y2={t.y2}
-                style={`stroke: var(${t.major ? "--ink" : "--ink-3"})`}
-                stroke-width={t.major ? 2 : 1}
-              />
-              {t.major && (
-                <text x={t.lx} y={t.ly} class="tick-label" text-anchor="middle" dominant-baseline="middle">
-                  {t.label}
-                </text>
-              )}
-            </>
-          ))
-        }
-        <g
-          data-gauge-needle
-          data-angle={G.start + G.sweep * ratio}
-          transform={`rotate(${G.start + G.sweep * ratio} ${G.cx} ${G.cy})`}
-        >
-          <line
-            x1={G.cx - 10}
-            y1={G.cy}
-            x2={G.cx + G.r - 20}
-            y2={G.cy}
-            style="stroke: var(--pink)"
-            stroke-width="3"
-            stroke-linecap="round"></line>
-        </g>
-        <circle cx={G.cx} cy={G.cy} r="7" style="fill: var(--ink)"></circle>
-      </svg>
-      <p class="odo">
-        <span class="odo-num" data-count={stats.totalKm}>{stats.totalKm.toLocaleString("en-US")}</span>
-        <span class="odo-unit mono">km</span>
-      </p>
-      <p class="meter-label mono">total distance</p>
-    </div>
-
-    <!-- ================================================= routes -->
-    <div class="ride-details">
-      {
-        routes.length > 0 && (
-          <div>
-            <h3 class="sub mono">// favorite routes</h3>
-            <ol class="routes">
-              {routes.map((r, i) => (
-                <li class="route" data-reveal style={`--c: ${colorAt(i + 1)}`}>
-                  <div class="route-head">
-                    <span class="route-name">{r.name}</span>
-                    <span class="route-area">{r.area}</span>
-                    <span class="route-km mono">{r.km} km</span>
-                  </div>
-                  <div class="route-bar">
-                    <span data-route-bar style={`width: ${(r.km / maxRoute) * 100}%`} />
-                  </div>
-                </li>
-              ))}
-            </ol>
-          </div>
-        )
-      }
-
-      <!-- ================================================= garage -->
-      <h3 class:list={["sub mono", { "garage-title": routes.length > 0 }]}>// garage</h3>
-      <ul class="bikes">
-        {
-          bikes.map((b) => (
-            <li class="bike" data-reveal>
-              <p class="bike-maker">{b.maker}</p>
-              <h4 class="bike-name">{b.name}</h4>
-              <dl class="bike-specs">
-                  <div class="bike-spec">
-                    <dt>年式</dt>
-                    <dd class="mono">{b.year}</dd>
-                  </div>
-                  {b.cc && (
-                    <div class="bike-spec">
-                      <dt>排気量</dt>
-                      <dd class="mono">{b.cc} cc</dd>
-                    </div>
-                  )}
-              </dl>
-              {b.note && <p class="bike-note">{b.note}</p>}
-            </li>
-          ))
-        }
-      </ul>
-    </div>
-  </div>
-
-  <!-- ================================================= ブロックの下端を走る小さなバイク -->
-  <div class="mini-road" aria-hidden="true">
+  <div class="riding-head">
+    <p class="lead mono">// riding — バイク</p>
+<div class="mini-road" aria-hidden="true">
     <div class="mini-track">
       <div class="mini-bike">
         <span class="mini-puffs"><i></i><i></i><i></i></span>
@@ -251,6 +113,143 @@ const maxRoute = Math.max(1, ...routes.map((r) => r.km));
       </div>
     </div>
   </div>
+  </div>
+
+  <div class="ride-grid">
+    <!-- ================================================= routes -->
+    <div class="ride-details">
+      {
+        routes.length > 0 && (
+          <div>
+            <h3 class="sub mono">// favorite routes</h3>
+            <ol class="routes">
+              {routes.map((r, i) => (
+                <li class="route" data-reveal style={`--c: ${colorAt(i + 1)}`}>
+                  <div class="route-head">
+                    <span class="route-name">{r.name}</span>
+                    <span class="route-area">{r.area}</span>
+                    <span class="route-km mono">{r.km} km</span>
+                  </div>
+                  <div class="route-bar">
+                    <span data-route-bar style={`width: ${(r.km / maxRoute) * 100}%`} />
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </div>
+        )
+      }
+
+      <!-- ================================================= garage -->
+      <ul class="bikes">
+        {
+          bikes.map((b) => (
+            <li class="bike" data-reveal>
+              <p class="bike-maker">{b.maker}</p>
+              <h4 class="bike-name">{b.name}</h4>
+              <dl class="bike-specs">
+                  <div class="bike-spec">
+                    <dt>年式</dt>
+                    <dd class="mono">{b.year}</dd>
+                  </div>
+                  {b.cc && (
+                    <div class="bike-spec">
+                      <dt>排気量</dt>
+                      <dd class="mono">{b.cc} cc</dd>
+                    </div>
+                  )}
+              </dl>
+              {b.note && <p class="bike-note">{b.note}</p>}
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <!-- ================================================= meter -->
+    <div class="gauge card" data-reveal>
+      <svg viewBox="0 0 220 200" aria-hidden="true">
+        <defs>
+          <linearGradient id="bk-gauge" x1="0" y1="1" x2="1" y2="0">
+            <stop offset="0" style="stop-color: var(--mint)"></stop>
+            <stop offset="0.5" style="stop-color: var(--cyan)"></stop>
+            <stop offset="1" style="stop-color: var(--pink)"></stop>
+          </linearGradient>
+        </defs>
+        <path d={arc} fill="none" style="stroke: var(--line)" stroke-width="10" stroke-linecap="round"></path>
+        <path
+          d={arc}
+          fill="none"
+          stroke="url(#bk-gauge)"
+          stroke-width="10"
+          stroke-linecap="round"
+          pathLength="1"
+          stroke-dasharray="1"
+          stroke-dashoffset={1 - ratio}
+          data-gauge-arc
+          data-ratio={ratio}></path>
+        {
+          ticks.map((t) => (
+            <>
+              <line
+                x1={t.x1}
+                y1={t.y1}
+                x2={t.x2}
+                y2={t.y2}
+                style={`stroke: var(${t.major ? "--ink" : "--ink-3"})`}
+                stroke-width={t.major ? 2 : 1}
+              />
+              {t.major && (
+                <text x={t.lx} y={t.ly} class="tick-label" text-anchor="middle" dominant-baseline="middle">
+                  {t.label}
+                </text>
+              )}
+            </>
+          ))
+        }
+        <g
+          data-gauge-needle
+          data-angle={G.start + G.sweep * ratio}
+          transform={`rotate(${G.start + G.sweep * ratio} ${G.cx} ${G.cy})`}
+        >
+          <line
+            x1={G.cx - 10}
+            y1={G.cy}
+            x2={G.cx + G.r - 20}
+            y2={G.cy}
+            style="stroke: var(--pink)"
+            stroke-width="3"
+            stroke-linecap="round"></line>
+        </g>
+        <circle cx={G.cx} cy={G.cy} r="7" style="fill: var(--ink)"></circle>
+      </svg>
+      <p class="odo">
+        <span class="odo-num" data-count={stats.totalKm}>{stats.totalKm.toLocaleString("en-US")}</span>
+        <span class="odo-unit mono">km</span>
+      </p>
+      <p class="meter-label mono">total distance</p>
+    </div>
+  </div>
+
+  {
+    bikePhotos.length > 0 && (
+      <div class="bike-photos">
+        {bikePhotos.map((p, i) => (
+          <figure class="bike-photo" data-reveal style={`--c: ${colorAt(i + 1)}`}>
+            <a href={p.image.src} data-photo-open data-photo-alt={p.caption || "バイクの写真"} aria-label={`${p.caption || "バイクの写真"}を拡大`}>
+              <Image
+                src={p.image}
+                alt={p.caption || "バイクの写真"}
+                widths={[480, 800, 1200]}
+                sizes="(max-width: 760px) 100vw, 50vw"
+                loading="lazy"
+              />
+            </a>
+          </figure>
+        ))}
+      </div>
+    )
+  }
 </div>
 
 <style>
@@ -259,8 +258,15 @@ const maxRoute = Math.max(1, ...routes.map((r) => r.km));
     margin-top: clamp(96px, 12vw, 160px);
   }
 
+  .riding-head {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
   .lead {
-    margin: 0 0 28px;
+    margin: 0;
     color: var(--ink-3);
     font-size: 0.95rem;
   }
@@ -270,7 +276,7 @@ const maxRoute = Math.max(1, ...routes.map((r) => r.km));
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
     gap: 14px;
-    margin-bottom: 40px;
+    margin-top: 40px;
   }
 
   .bike-photo {
@@ -308,7 +314,7 @@ const maxRoute = Math.max(1, ...routes.map((r) => r.km));
   /* ---------- meter + routes */
   .ride-grid {
     display: grid;
-    grid-template-columns: minmax(240px, 320px) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) minmax(240px, 320px);
     gap: clamp(28px, 5vw, 64px);
     align-items: center;
   }
@@ -412,10 +418,6 @@ const maxRoute = Math.max(1, ...routes.map((r) => r.km));
   }
 
   /* ---------- garage */
-  .garage-title {
-    margin-top: 48px;
-  }
-
   .bikes {
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
   }
@@ -488,31 +490,26 @@ const maxRoute = Math.max(1, ...routes.map((r) => r.km));
     color: var(--ink-2);
   }
 
-  /* ---------- 下端を走る小さなバイク（CSS アニメーションのみ・transform だけ） */
+  /* ---------- riding 見出し横の小さなバイク */
   .mini-road {
-    --mini-bike-width: 100px;
     position: relative;
-    height: 64px;
-    margin-top: 48px;
-    overflow: hidden;
-    border-bottom: 1px solid var(--line);
+    flex: 0 0 72px;
+    height: 40px;
+    opacity: 0.75;
   }
 
-  /* 幅 100% の帯を 0 → 100%+バイク幅 まで動かし、その中のバイクを端から端へ */
   .mini-track {
     position: absolute;
     inset: 0;
-    animation: mini-ride 16s linear infinite;
-    will-change: transform;
   }
 
   .mini-bike {
     position: absolute;
-    right: 100%;
-    bottom: 1px;
-    width: var(--mini-bike-width);
+    right: 0;
+    bottom: 0;
+    width: 64px;
     aspect-ratio: 400 / 240;
-    animation: mini-bob 0.36s ease-in-out infinite alternate;
+    animation: mini-bob 1.2s ease-in-out infinite alternate;
   }
 
   .mini-bike svg {
@@ -525,7 +522,7 @@ const maxRoute = Math.max(1, ...routes.map((r) => r.km));
   .mini-wheel {
     transform-box: view-box;
     transform-origin: var(--wheel-x) 177px;
-    animation: mini-spin 0.65s linear infinite;
+    animation: mini-spin 2.4s linear infinite;
   }
 
   .mini-puffs i {
@@ -548,15 +545,6 @@ const maxRoute = Math.max(1, ...routes.map((r) => r.km));
     animation-delay: 0.6s;
   }
 
-  @keyframes mini-ride {
-    from {
-      transform: translateX(0);
-    }
-    to {
-      transform: translateX(calc(100% + var(--mini-bike-width)));
-    }
-  }
-
   @keyframes mini-bob {
     to {
       translate: 0 -1.5px;
@@ -571,12 +559,12 @@ const maxRoute = Math.max(1, ...routes.map((r) => r.km));
 
   @keyframes mini-puff {
     0% {
-      opacity: 0.7;
+      opacity: 0.3;
       transform: translate(0, 0) scale(0.6);
     }
     100% {
       opacity: 0;
-      transform: translate(-26px, -6px) scale(1.8);
+      transform: translate(-12px, -3px) scale(1.4);
     }
   }
 
@@ -588,9 +576,6 @@ const maxRoute = Math.max(1, ...routes.map((r) => r.km));
       animation: none;
     }
 
-    .mini-track {
-      transform: translateX(80%);
-    }
   }
 
   @media (max-width: 760px) {
