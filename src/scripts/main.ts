@@ -41,11 +41,19 @@ if (!reduced) {
 
 // 写真の切り替えによる高さの変化を反映してから、新しい旅行先へ移動する。
 window.addEventListener("travel:opened", (event) => {
-  const entry = (event as CustomEvent<HTMLElement>).detail;
+  const { entry, viewportTop } = (event as CustomEvent<{
+    entry: HTMLElement;
+    viewportTop?: number;
+  }>).detail;
   const navBottom = document.querySelector("header.nav")?.getBoundingClientRect().bottom ?? 0;
-  const top = Math.max(0, window.scrollY + entry.getBoundingClientRect().top - navBottom - 16);
+  const entryTop = window.scrollY + entry.getBoundingClientRect().top;
+  const top = Math.max(0, entryTop - navBottom - 16);
   if (lenis) {
     lenis.resize();
+    if (viewportTop !== undefined) {
+      // 閉じた写真の高さを相殺し、タップ時の見出し位置から動かす。
+      lenis.scrollTo(Math.max(0, entryTop - viewportTop), { immediate: true, force: true });
+    }
     lenis.scrollTo(top, { duration: 0.8, force: true });
   } else {
     window.scrollTo({ top, behavior: "instant" });

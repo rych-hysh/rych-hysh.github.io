@@ -121,19 +121,30 @@ const groups = limit
 
   document.querySelectorAll<HTMLElement>("[data-travel]").forEach((root) => {
     const entries = Array.from(root.querySelectorAll<HTMLDetailsElement>("[data-trip-entry]"));
+    const alignEntry = (entry: HTMLDetailsElement, viewportTop?: number) => {
+      entries.forEach((other) => { if (other !== entry) other.open = false; });
+      ScrollTrigger.refresh();
+      window.dispatchEvent(new CustomEvent("travel:opened", { detail: { entry, viewportTop } }));
+    };
     entries.forEach((entry) => {
+      let alignedByClick = false;
+      entry.querySelector("summary")?.addEventListener("click", (event) => {
+        event.preventDefault();
+        const viewportTop = entry.getBoundingClientRect().top;
+        entry.open = !entry.open;
+        if (entry.open) {
+          alignedByClick = true;
+          // レイアウトの変更と開始位置の補正を、次の描画より前にまとめて行う。
+          alignEntry(entry, viewportTop);
+        }
+      });
       entry.addEventListener("toggle", () => {
-        if (!entry.open) {
-          requestAnimationFrame(() => ScrollTrigger.refresh());
+        if (alignedByClick) {
+          alignedByClick = false;
           return;
         }
-        entries.forEach((other) => { if (other !== entry) other.open = false; });
-        // 他の写真を閉じた後の位置で、開いた旅行先を固定ナビの直下に揃える。
-        requestAnimationFrame(() => {
-          if (!entry.open) return;
-          ScrollTrigger.refresh();
-          window.dispatchEvent(new CustomEvent("travel:opened", { detail: entry }));
-        });
+        if (entry.open) alignEntry(entry);
+        else requestAnimationFrame(() => ScrollTrigger.refresh());
       });
     });
 
