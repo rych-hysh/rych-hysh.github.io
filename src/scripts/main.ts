@@ -39,6 +39,19 @@ if (!reduced) {
   gsap.ticker.lagSmoothing(0);
 }
 
+// 写真の切り替えによる高さの変化を反映してから、新しい旅行先へ移動する。
+window.addEventListener("travel:opened", (event) => {
+  const entry = (event as CustomEvent<HTMLElement>).detail;
+  const navBottom = document.querySelector("header.nav")?.getBoundingClientRect().bottom ?? 0;
+  const top = Math.max(0, window.scrollY + entry.getBoundingClientRect().top - navBottom - 16);
+  if (lenis) {
+    lenis.resize();
+    lenis.scrollTo(top, { duration: 0.8, force: true });
+  } else {
+    window.scrollTo({ top, behavior: "instant" });
+  }
+});
+
 // アンカーリンク（#xxx / 同じページの /#xxx）は Lenis 経由でスクロール
 $$<HTMLAnchorElement>('a[href^="#"], a[href^="/#"]').forEach((a) => {
   a.addEventListener("click", (e) => {

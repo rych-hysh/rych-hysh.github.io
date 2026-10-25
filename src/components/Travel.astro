@@ -123,9 +123,17 @@ const groups = limit
     const entries = Array.from(root.querySelectorAll<HTMLDetailsElement>("[data-trip-entry]"));
     entries.forEach((entry) => {
       entry.addEventListener("toggle", () => {
-        if (entry.open) entries.forEach((other) => { if (other !== entry) other.open = false; });
-        // 展開で下のセクションの位置が変わるので、既存アニメーションの基準も更新する。
-        requestAnimationFrame(() => ScrollTrigger.refresh());
+        if (!entry.open) {
+          requestAnimationFrame(() => ScrollTrigger.refresh());
+          return;
+        }
+        entries.forEach((other) => { if (other !== entry) other.open = false; });
+        // 他の写真を閉じた後の位置で、開いた旅行先を固定ナビの直下に揃える。
+        requestAnimationFrame(() => {
+          if (!entry.open) return;
+          ScrollTrigger.refresh();
+          window.dispatchEvent(new CustomEvent("travel:opened", { detail: entry }));
+        });
       });
     });
 

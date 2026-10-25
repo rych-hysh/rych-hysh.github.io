@@ -16,7 +16,7 @@ import Travel from "./Travel.astro";
 
   <PhotoGallery />
 
-  <div class:list={["container travel", { "travel-with-photos": photos.length > 0 }]}>
+  <div id="travel" class:list={["container travel", { "travel-with-photos": photos.length > 0 }]}>
     <p class="lead mono">// travel — 行った場所</p>
     <Travel limit={3} />
   </div>
@@ -34,6 +34,10 @@ import Travel from "./Travel.astro";
   }
 
   /* ---------- travel ---------- */
+  .travel {
+    scroll-margin-top: 140px;
+  }
+
   .travel-with-photos {
     margin-top: clamp(96px, 12vw, 160px);
   }
