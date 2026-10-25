@@ -10,7 +10,7 @@ import type { Topology, GeometryCollection } from "topojson-specification";
 import type { Feature, MultiPolygon, Polygon } from "geojson";
 import land from "world-atlas/land-110m.json";
 
-type Trip = { place: string; region: string; lat: number; lng: number };
+type Trip = { id: string; place: string; region: string; lat: number; lng: number };
 
 const RAD = Math.PI / 180;
 
@@ -168,7 +168,12 @@ export function initGlobe(canvas: HTMLCanvasElement, reduced: boolean) {
   const rgb = (hex: string) =>
     [1, 3, 5].map((k) => parseInt(hex.slice(k, k + 2), 16)).join(", ");
   const label = canvas.parentElement!.querySelector<HTMLElement>("[data-globe-label]");
-  const items = document.querySelectorAll<HTMLElement>("[data-trip]");
+  const root = canvas.closest<HTMLElement>("[data-travel]")!;
+  const items = Array.from(root.querySelectorAll<HTMLElement>("[data-trip]"));
+  const selectedIndex = () => {
+    const summary = root.querySelector<HTMLElement>("[data-trip-entry][open] > [data-trip]");
+    return summary ? Number(summary.dataset.trip) : -1;
+  };
   const ctx = canvas.getContext("2d")!;
 
   const coarse = buildDotSet(buildLandDots(), COARSE_TILE);
@@ -178,6 +183,7 @@ export function initGlobe(canvas: HTMLCanvasElement, reduced: boolean) {
     .then((r) => r.json())
     .then((arr: number[]) => {
       fine = buildDotSet(arr, FINE_TILE);
+      redrawIfIdle();
     })
     .catch(() => {});
 
@@ -437,7 +443,7 @@ export function initGlobe(canvas: HTMLCanvasElement, reduced: boolean) {
   function focus(i: number) {
     active = i;
     autoRotate = false;
-    items.forEach((el, k) => el.classList.toggle("active", k === i));
+    items.forEach((el) => el.classList.toggle("active", Number(el.dataset.trip) === i));
     const trip = trips[i];
     const japan = inBox(trip.lat, trip.lng, JAPAN);
     // 最短方向で回転
@@ -463,6 +469,11 @@ export function initGlobe(canvas: HTMLCanvasElement, reduced: boolean) {
   }
 
   function unfocus() {
+    const selected = selectedIndex();
+    if (selected !== -1) {
+      focus(selected);
+      return;
+    }
     active = -1;
     autoRotate = !reduced;
     if (view.zoom !== 1) {
@@ -488,11 +499,46 @@ export function initGlobe(canvas: HTMLCanvasElement, reduced: boolean) {
     el.addEventListener("blur", unfocus);
   });
 
+  root.addEventListener("toggle", (e) => {
+    if (e.target instanceof HTMLDetailsElement && e.target.matches("[data-trip-entry]")) unfocus();
+  }, true);
+
+  function selectPin(x: number, y: number) {
+    updateMatrix();
+    // ピンが円の外に隠れている場合は選択しない。
+    if (Math.hypot(x - size / 2, y - size / 2) > baseR()) return;
+    let nearest = -1;
+    let distance = 20;
+    trips.forEach((trip, i) => {
+      const p = project(trip.lat, trip.lng);
+      const d = Math.hypot(x - p.x, y - p.y);
+      if (p.z > 0 && Math.hypot(p.x - size / 2, p.y - size / 2) <= baseR() && d < distance) {
+        nearest = i;
+        distance = d;
+      }
+    });
+    if (nearest === -1) return;
+    const item = items.find((el) => Number(el.dataset.trip) === nearest);
+    if (!item) {
+      // トップの3件に含まれない場所も、旅行ページの該当箇所へ直接移動できる。
+      window.location.assign(`/travel/#travel-${trips[nearest].id}`);
+      return;
+    }
+    const entry = item.closest<HTMLDetailsElement>("details");
+    if (entry) entry.open = true;
+    item.focus({ preventScroll: true });
+    item.scrollIntoView({ block: "nearest" });
+    focus(nearest);
+  }
+
   // ドラッグで回転（ズーム中は回転を遅く）
   // 地球儀に触れている間はページのスクロールより回転を優先（canvas は CSS で touch-action: none）
   let pointerId = -1;
   let lastX = 0;
   let lastY = 0;
+  let startX = 0;
+  let startY = 0;
+  let moved = false;
 
   canvas.addEventListener("pointerdown", (e) => {
     if (pointerId !== -1) return; // 2 本目の指は無視
@@ -500,12 +546,16 @@ export function initGlobe(canvas: HTMLCanvasElement, reduced: boolean) {
     dragging = true;
     lastX = e.clientX;
     lastY = e.clientY;
+    startX = e.clientX;
+    startY = e.clientY;
+    moved = false;
     canvas.setPointerCapture(e.pointerId);
     gsap.killTweensOf(view, "lng,lat,zoom");
   });
 
   canvas.addEventListener("pointermove", (e) => {
     if (e.pointerId !== pointerId) return;
+    if (Math.hypot(e.clientX - startX, e.clientY - startY) > 6) moved = true;
     view.lng += ((e.clientX - lastX) * 0.4) / view.zoom;
     view.lat = Math.max(-80, Math.min(80, view.lat + ((e.clientY - lastY) * 0.3) / view.zoom));
     lastX = e.clientX;
@@ -517,11 +567,20 @@ export function initGlobe(canvas: HTMLCanvasElement, reduced: boolean) {
     if (e.pointerId !== pointerId) return;
     dragging = false;
     pointerId = -1;
+    if (e.type === "pointerup" && !moved) {
+      const rect = canvas.getBoundingClientRect();
+      selectPin(e.clientX - rect.left, e.clientY - rect.top);
+    }
   };
   canvas.addEventListener("pointerup", end);
   canvas.addEventListener("pointercancel", end);
 
   resize();
+  if (selectedIndex() !== -1) focus(selectedIndex());
+  else {
+    const focused = items.find((el) => el === document.activeElement);
+    if (focused) focus(Number(focused.dataset.trip));
+  }
   window.addEventListener("resize", () => {
     resize();
     draw();
@@ -539,7 +598,13 @@ export function initGlobe(canvas: HTMLCanvasElement, reduced: boolean) {
     if (entry.isIntersecting) {
       if (!introduced) {
         introduced = true;
-        gsap.to(view, { intro: 1, lng: view.lng + 60, duration: 2, ease: "expo.out" });
+        gsap.to(view, {
+          intro: 1,
+          // 固定リンクから開いた場所への回転を、登場演出で上書きしない。
+          ...(active === -1 ? { lng: view.lng + 60 } : {}),
+          duration: 2,
+          ease: "expo.out",
+        });
       }
       if (!running) {
         running = true;

@@ -2,6 +2,7 @@
 // 旅行先：地球儀＋一覧。地球儀には常に全件のピンを表示し、一覧は limit 件まで（省略時は全件を地域ごとに表示）
 import { trips } from "../data/profile";
 import { colorAt, palette } from "../data/palette";
+import { Image } from "astro:assets";
 
 interface Props {
   /** 一覧に出す件数。指定すると「すべて見る」リンクを付ける */
@@ -12,6 +13,8 @@ const { limit } = Astro.props;
 const indexed = trips.map((t, i) => ({ ...t, i }));
 const shown = limit ? indexed.slice(0, limit) : indexed;
 const rest = limit ? trips.length - shown.length : 0;
+// Canvas に必要な情報だけを渡す（写真のメタデータは HTML 側で利用）。
+const pins = trips.map(({ id, place, region, lat, lng }) => ({ id, place, region, lat, lng }));
 
 // 全件表示のときは地域ごとにまとめる（YAML に出てくる順）
 const groups = limit
@@ -22,18 +25,19 @@ const groups = limit
     }));
 ---
 
-<div class:list={["travel-grid", { "is-full": !limit }]}>
+<div class:list={["travel-grid", { "is-full": !limit }]} data-travel>
   <div class="globe-wrap" data-reveal data-anim-scope>
     <canvas
       class="globe"
       data-globe
-      data-trips={JSON.stringify(trips)}
+      data-trips={JSON.stringify(pins)}
       data-colors={JSON.stringify(palette)}
       aria-label="訪れた場所を示す地球儀"></canvas>
     <span class="globe-label mono" data-globe-label></span>
   </div>
 
   <div class="trip-list">
+    <p class="trip-help">＋のある場所で、写真と記録を見る<span class="mono">地球儀はドラッグで回転</span></p>
     {
       groups.map((g) => (
         <section class="trip-group">
@@ -44,13 +48,53 @@ const groups = limit
           )}
           <ol class="trips">
             {g.items.map((t) => (
-              <li class="trip" data-reveal data-trip={t.i} tabindex="0" style={`--c: ${colorAt(t.i)}`}>
-                <span class="mono trip-no">{String(t.i + 1).padStart(2, "0")}</span>
-                <span class="trip-place">{t.place}</span>
-                <span class="trip-region">{limit && t.region !== t.place ? t.region : ""}</span>
-                <span class="mono trip-coord">
-                  {t.lat.toFixed(2)}, {t.lng.toFixed(2)}
-                </span>
+              <li data-reveal style={`--c: ${colorAt(t.i)}`}>
+                {t.photos.length > 0 ? <details class="trip-entry" id={`travel-${t.id}`} data-trip-entry>
+                  <summary class="trip" data-trip={t.i}>
+                    <span class="mono trip-no">{String(t.i + 1).padStart(2, "0")}</span>
+                    <span class="trip-place">{t.place}</span>
+                    <span class="trip-region">{limit && t.region !== t.place ? t.region : ""}</span>
+                    <span class="trip-status">
+                      写真 {t.photos.length}枚
+                    </span>
+                    <span class="trip-toggle" aria-hidden="true">＋</span>
+                  </summary>
+                  <div class="trip-detail">
+                    <p class="trip-coord mono">{t.lat.toFixed(2)}, {t.lng.toFixed(2)}</p>
+                    {t.description && <p class="trip-description">{t.description}</p>}
+                      <div class="trip-photos">
+                        {t.photos.map((photo, photoIndex) => (
+                          <figure class="trip-photo">
+                            <Image
+                              src={photo.image}
+                              alt={photo.alt}
+                              widths={[360, 640, 960]}
+                              sizes="(max-width: 860px) 90vw, 44vw"
+                              loading="lazy"
+                              decoding="async"
+                            />
+                            <figcaption>
+                              <span class="photo-index mono">{String(photoIndex + 1).padStart(2, "0")} / {String(t.photos.length).padStart(2, "0")}</span>
+                              {photo.caption && <span>{photo.caption}</span>}
+                            </figcaption>
+                          </figure>
+                        ))}
+                      </div>
+                  </div>
+                </details> : (
+                  <button
+                    type="button"
+                    class="trip trip-entry trip-pin"
+                    id={`travel-${t.id}`}
+                    data-trip={t.i}
+                    data-trip-location
+                    aria-label={`${t.place}を地球儀で見る`}
+                  >
+                    <span class="mono trip-no">{String(t.i + 1).padStart(2, "0")}</span>
+                    <span class="trip-place">{t.place}</span>
+                    <span class="trip-region">{limit && t.region !== t.place ? t.region : ""}</span>
+                  </button>
+                )}
               </li>
             ))}
           </ol>
@@ -71,6 +115,32 @@ const groups = limit
     }
   </div>
 </div>
+
+<script>
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+  document.querySelectorAll<HTMLElement>("[data-travel]").forEach((root) => {
+    const entries = Array.from(root.querySelectorAll<HTMLDetailsElement>("[data-trip-entry]"));
+    entries.forEach((entry) => {
+      entry.addEventListener("toggle", () => {
+        if (entry.open) entries.forEach((other) => { if (other !== entry) other.open = false; });
+        // 展開で下のセクションの位置が変わるので、既存アニメーションの基準も更新する。
+        requestAnimationFrame(() => ScrollTrigger.refresh());
+      });
+    });
+
+    const openHash = () => {
+      const targets = Array.from(root.querySelectorAll<HTMLElement>("[data-trip-entry], [data-trip-location]"));
+      const entry = targets.find((el) => `#${el.id}` === location.hash);
+      if (!entry) return;
+      if (entry instanceof HTMLDetailsElement) entry.open = true;
+      else entry.focus({ preventScroll: true });
+      requestAnimationFrame(() => entry.scrollIntoView({ block: "start" }));
+    };
+    openHash();
+    window.addEventListener("hashchange", openHash);
+  });
+</script>
 
 <style>
   .travel-grid {
@@ -163,25 +233,57 @@ const groups = limit
     border-top: 1px solid var(--line);
   }
 
+  .trip-list { min-width: 0; }
+
+  .trip-help {
+    margin: 0 0 20px;
+    font-size: 0.9rem;
+    color: var(--ink-2);
+  }
+
+  .trip-help span { display: block; font-size: 0.75rem; margin-top: 4px; }
+
+  .trip-entry {
+    border-bottom: 1px solid var(--line);
+    scroll-margin-top: 100px;
+  }
+
+  .trip-entry[open] { background: var(--surface); border-radius: 0 0 16px 16px; }
+
   .trip {
     display: grid;
-    grid-template-columns: 32px 1fr auto;
+    grid-template-columns: 26px minmax(0, 1fr) auto 18px;
     grid-template-areas:
-      "no place coord"
-      "no region coord";
-    column-gap: 14px;
-    padding: 10px 8px;
-    border-bottom: 1px solid var(--line);
+      "no place status toggle"
+      "no region status toggle";
+    column-gap: 10px;
+    padding: 16px 8px;
+    min-height: 64px;
     cursor: pointer;
-    outline: none;
+    list-style: none;
     transition:
       background 0.25s,
       padding 0.25s;
   }
 
+  .trip::-webkit-details-marker { display: none; }
+
+  .trip-pin {
+    width: 100%;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+  }
+
+  .trip:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+
   .trip:hover,
   .trip:focus-visible,
-  .trip.active {
+  .trip.active,
+  .trip-entry[open] > .trip {
     padding-left: 16px;
     background: linear-gradient(90deg, color-mix(in srgb, var(--c) 16%, transparent), transparent);
   }
@@ -198,6 +300,7 @@ const groups = limit
     font-size: 1.05rem;
     font-weight: 500;
     line-height: 1.3;
+    overflow-wrap: anywhere;
   }
 
   .trip-region {
@@ -207,11 +310,28 @@ const groups = limit
   }
 
   .trip-coord {
-    grid-area: coord;
-    align-self: center;
+    margin: 0 0 12px;
     font-size: 0.75rem;
-    color: var(--ink-3);
+    color: var(--ink-2);
   }
+
+  .trip-status { grid-area: status; align-self: center; font-size: 0.72rem; color: var(--ink-2); }
+  .trip-toggle { grid-area: toggle; align-self: center; color: var(--ink-2); font-size: 1.1rem; }
+  .trip-entry[open] .trip-toggle { rotate: 45deg; }
+  .trip-detail { padding: 4px 16px 24px; }
+  .trip-description { margin: 0 0 20px; font-size: 0.92rem; white-space: pre-line; overflow-wrap: anywhere; }
+  .trip-photos { display: grid; gap: 28px; }
+  .trip-photo { margin: 0; min-width: 0; }
+  .trip-photo img {
+    width: 100%;
+    height: auto;
+    max-height: 500px;
+    object-fit: contain;
+    background: var(--bg-2);
+    border-radius: 12px;
+  }
+  .trip-photo figcaption { display: grid; gap: 6px; padding-top: 10px; font-size: 0.85rem; color: var(--ink-2); overflow-wrap: anywhere; }
+  .photo-index { font-size: 0.7rem; }
 
   /* 全件表示のページでは、一覧をスクロールしている間も地球儀を画面に残す（PC） */
   @media (min-width: 861px) {
@@ -229,6 +349,14 @@ const groups = limit
     .travel-grid {
       grid-template-columns: 1fr;
     }
+    .globe-wrap { max-width: 360px; }
+  }
+
+  @media (max-width: 400px) {
+    .trip { column-gap: 6px; grid-template-columns: 22px minmax(0, 1fr) auto 16px; }
+    .trip-place { font-size: 0.95rem; }
+    .trip-status { font-size: 0.65rem; }
+    .trip-detail { padding-inline: 10px; }
   }
   /* ---------- 「すべて見る」 */
   .trip-more {
@@ -302,7 +430,7 @@ const groups = limit
 
   /* 地域ごとの表示では地域名は見出しに出ているので、行は 1 段に */
   .is-full .trip {
-    grid-template-areas: "no place coord";
+    grid-template-areas: "no place status toggle";
     align-items: center;
   }
 

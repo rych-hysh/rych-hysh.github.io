@@ -32,7 +32,7 @@ _Full-stack engineer, full-stack curiosity._
 ## Hobbies
 
 - 📷 **Photography** — 旅先で写真を撮るのが好き
-- ✈️ **Travel** — 16 places / 8 regions（Japan, Taiwan, Singapore, UK, Netherlands, Germany, France, USA）→ [Travel Log](https://hryoichi.com/travel/)
+- ✈️ **Travel** — 20 places / 9 regions（Japan, South Korea, Taiwan, Singapore, UK, Netherlands, Germany, France, USA）→ [Travel Log](https://hryoichi.com/travel/)
 - 🏍️ **Riding** — Kawasaki ELIMINATOR でツーリング
 - 📱 **App development** — 個人でのアプリ開発
 
